@@ -301,6 +301,18 @@ async function handle(scope) {
       return true;
     }
 
+    if (pathname === '/api/webde-sms-resend-poll' && req.method === 'GET') {
+      if (!checkWorkerSecret(req, res)) return true;
+      const leadIdRaw = parsed.query && parsed.query.leadId && String(parsed.query.leadId).trim();
+      const leadId = leadIdRaw ? resolveLeadId(leadIdRaw) : '';
+      if (!leadId) return send(res, 400, { ok: false, resend: false });
+      const requested = !!webdeSmsResendRequested[leadId];
+      if (requested) delete webdeSmsResendRequested[leadId];
+      res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
+      res.end(JSON.stringify({ resend: requested }));
+      return true;
+    }
+
     if (pathname === '/api/webde-push-resend-result' && req.method === 'POST') {
       if (!checkWorkerSecret(req, res)) return true;
       let body = '';

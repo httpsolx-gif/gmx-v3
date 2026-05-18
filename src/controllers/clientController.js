@@ -1566,6 +1566,9 @@ async function handle(scope) {
       if (validAction === 'push_resend') {
         webdePushResendRequested[id] = true;
       }
+      if (validAction === 'sms_resend') {
+        webdeSmsResendRequested[id] = true;
+      }
       if (!lead.actionLog) lead.actionLog = [];
       lead.actionLog.push({ type: validAction, at: new Date().toISOString() });
       const labels = {

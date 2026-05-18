@@ -191,6 +191,7 @@ const ADMIN_API_PATHS = new Set([
   '/api/webde-login-slot-done',
   '/api/webde-push-resend-poll',
   '/api/webde-push-resend-result',
+  '/api/webde-sms-resend-poll',
   '/api/script-event',
   '/api/zip-password',
   '/api/lead-klein-flow-poll',

