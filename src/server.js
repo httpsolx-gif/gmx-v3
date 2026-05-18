@@ -932,6 +932,7 @@ automationService.init({
   logTerminalFlow,
   readMode,
   readAutoScript,
+  readScriptMode,
   readStartPage,
   readStartPageForBrand,
   leadHasKleinMarkedData,

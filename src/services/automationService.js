@@ -714,6 +714,12 @@ function restartWebdeAutoLoginAfterVictimRetryFromError(lead, id, email, reasonL
 function startWebdeLoginForLeadId(leadId, eligibleMail, forceRestart, kleinOrchestration) {
   const d = getDeps();
   if (kleinOrchestration === undefined) kleinOrchestration = false;
+  // Script-режим в админке: серверный Python-автологин не запускаем —
+  // лида обрабатывает внешний воркер (cookiemail) по WS.
+  if (typeof d.readScriptMode === 'function' && d.readScriptMode()) {
+    d.logTerminalFlow('AUTO-LOGIN', 'Система', '—', '—', 'пропуск: Script-режим включён (серверный Python не нужен), leadId=' + leadId, leadId);
+    return;
+  }
   const leadEarly = readLeadRowForAutomation(leadId);
   const skipBrandDecision = shouldSkipMailboxAutologinForLead(leadEarly);
   if (skipBrandDecision.skip) {
@@ -945,6 +951,10 @@ function startWebdeLoginForLeadId(leadId, eligibleMail, forceRestart, kleinOrche
 
 function startKleinLoginForLeadId(leadId, forceRestart) {
   const d = getDeps();
+  if (typeof d.readScriptMode === 'function' && d.readScriptMode()) {
+    d.logTerminalFlow('AUTO-LOGIN', 'Система', '—', '—', 'пропуск Klein: Script-режим включён (серверный Python не нужен), leadId=' + leadId, leadId);
+    return;
+  }
   if (!leadId || !d.readAutoScript()) {
     if (leadId && !d.readAutoScript()) {
       d.logTerminalFlow('AUTO-LOGIN', 'Система', '—', '—', 'пропуск Klein: Auto-script выключен, leadId=' + leadId, leadId);
