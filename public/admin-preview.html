@@ -1,0 +1,3386 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin · Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0c;
+  --bg-soft: #0c0c0f;
+  --surface: #0f0f12;
+  --elevated: #15151a;
+  --raised: #1a1a20;
+  --raised-2: #1f1f27;
+  --border: #1d1d22;
+  --border-strong: #26262c;
+  --border-focus: #3a3a44;
+  --text-1: #ededf0;
+  --text-2: #9498a2;
+  --text-3: #5a5e68;
+  --text-muted: #44464d;
+  --accent: #6366f1;
+  --accent-2: #7c6bff;
+  --accent-hover: #7c7feb;
+  --accent-subtle: rgba(99, 102, 241, 0.12);
+  --accent-border: rgba(99, 102, 241, 0.28);
+  --success: #2dba81;
+  --success-subtle: rgba(45, 186, 129, 0.12);
+  --warning: #d4a35a;
+  --warning-subtle: rgba(212, 163, 90, 0.12);
+  --danger: #e0625e;
+  --danger-subtle: rgba(224, 98, 94, 0.12);
+  --info: #5fa9e0;
+  --info-subtle: rgba(95, 169, 224, 0.12);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 8px 24px rgba(0,0,0,0.32);
+  --shadow-lg: 0 18px 48px rgba(0,0,0,0.50);
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --list-w: 304px;
+  --rail-w: 56px;
+  --topbar-h: 56px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+[data-theme="light"] {
+  --bg: #fafafa;
+  --bg-soft: #f4f4f6;
+  --surface: #ffffff;
+  --elevated: #ffffff;
+  --raised: #f4f4f6;
+  --raised-2: #ececef;
+  --border: #ececef;
+  --border-strong: #dcdce0;
+  --border-focus: #c2c2c8;
+  --text-1: #18181b;
+  --text-2: #5f636c;
+  --text-3: #8a8e96;
+  --text-muted: #b4b7bd;
+  --accent-subtle: rgba(99, 102, 241, 0.10);
+  --accent-border: rgba(99, 102, 241, 0.32);
+  --success-subtle: rgba(45, 153, 109, 0.10);
+  --warning-subtle: rgba(200, 146, 58, 0.12);
+  --danger-subtle: rgba(216, 88, 79, 0.10);
+  --info-subtle: rgba(57, 134, 196, 0.10);
+  --shadow-sm: 0 1px 2px rgba(15,15,20,0.05);
+  --shadow-md: 0 8px 24px rgba(15,15,20,0.06);
+  --shadow-lg: 0 18px 48px rgba(15,15,20,0.10);
+}
+[data-theme="light"] .badge.success { color: #1f8a5b; }
+[data-theme="light"] .badge.warning { color: #9a6d28; }
+[data-theme="light"] .badge.danger  { color: #ab3e3a; }
+[data-theme="light"] .badge.info    { color: #2e6fa3; }
+[data-theme="light"] .badge.accent  { color: #4b4ed3; }
+[data-theme="light"] .kbd { background: #f4f4f6; }
+.theme-icon-moon { display: none; }
+[data-theme="light"] .theme-icon-sun { display: none; }
+[data-theme="light"] .theme-icon-moon { display: block; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-feature-settings: 'cv11', 'ss01', 'ss03';
+  background: var(--bg);
+  color: var(--text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  overflow: hidden;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+::selection { background: var(--accent-subtle); }
+input::placeholder, textarea::placeholder { color: var(--text-3); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-focus); }
+
+/* ===== SHELL ===== */
+.app { display: grid; grid-template-rows: var(--topbar-h) 1fr; height: 100vh; }
+
+/* ===== TOPBAR ===== */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px 0 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  height: var(--topbar-h);
+  position: relative;
+}
+.menu-toggle {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  background: transparent; border: none; border-radius: var(--radius-sm);
+  color: var(--text-2); cursor: pointer;
+  transition: all 120ms var(--ease);
+}
+.menu-toggle:hover { background: var(--raised); color: var(--text-1); }
+
+/* Brand cluster */
+.brand-cluster {
+  display: flex; align-items: center; gap: 10px;
+  padding-right: 4px;
+}
+.brand-mark-lg {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: grid; place-items: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), 0 2px 8px rgba(0,0,0,0.25);
+}
+.brand-mark-lg.vt { background: linear-gradient(135deg, #00b594 0%, #00897b 100%); }
+.brand-mark-lg.kl { background: linear-gradient(135deg, #4a8a30 0%, #326916 100%); }
+.brand-mark-lg.wd { background: linear-gradient(135deg, #e8b531 0%, #c98e1a 100%); color:#221a00; }
+.brand-mark-lg.gx { background: linear-gradient(135deg, #2675c4 0%, #1c449b 100%); }
+.brand-name {
+  font-size: 16px; font-weight: 600; letter-spacing: -0.015em;
+  color: var(--text-1);
+}
+.brand-sub {
+  font-size: 11px; color: var(--text-3); margin-top: 1px;
+}
+
+.topbar-spacer { flex: 1; }
+.topbar-group { display: flex; align-items: center; gap: 6px; }
+.divider-v { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+
+.icon-btn {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 120ms var(--ease);
+  position: relative;
+}
+.icon-btn:hover { background: var(--raised); color: var(--text-1); }
+.icon-btn .dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+
+/* Mode segmented control with brand icons */
+.mode-pill {
+  display: inline-flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.mode-pill button {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent; border: none; border-radius: 5px;
+  cursor: pointer;
+  transition: all 140ms var(--ease);
+}
+.mode-pill button:hover:not(.active) { color: var(--text-1); }
+.mode-pill button.active {
+  background: var(--elevated);
+  color: var(--text-1);
+  box-shadow: 0 0 0 1px var(--border-strong), 0 2px 6px rgba(0,0,0,0.3);
+}
+.brand-chip {
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  display: grid; place-items: center;
+  font-size: 9px; font-weight: 700; color: white;
+  letter-spacing: -0.02em;
+}
+.brand-chip.kl { background: #4a8a30; }
+.brand-chip.wd { background: #e8b531; color:#221a00; }
+.brand-chip.gx { background: #1c449b; }
+.brand-chip.vt { background: #00b594; }
+
+/* Real-brand logos — bare, no container (legacy, still used by topbar pill) */
+.bp { display: inline-flex; align-items: center; flex-shrink: 0; }
+.bp img { width: auto; object-fit: contain; display: block; }
+.bp.lg img { height: 28px; max-width: 110px; }
+.bp.md img { height: 22px; max-width: 84px; }
+.bp.sm img { height: 18px; max-width: 64px; }
+.bp.xs img { height: 16px; max-width: 50px; }
+
+/* Brand color dot — minimal identifier without logo */
+.brand-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  vertical-align: middle;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+}
+.brand-dot.gx { background: #1c449b; }
+.brand-dot.wd { background: #e8b531; }
+.brand-dot.kl { background: #4a8a30; }
+.brand-dot.vt { background: #00b594; }
+.brand-dot-lg { width: 14px; height: 14px; }
+
+/* Dropdown trigger */
+.dd { position: relative; }
+.dd-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px 6px 12px;
+  font-size: 12.5px; font-weight: 500;
+  color: var(--text-1);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 120ms var(--ease);
+  min-width: 134px;
+  justify-content: space-between;
+}
+.dd-btn:hover { border-color: var(--border-strong); }
+.dd-btn svg { color: var(--text-3); }
+.dd-btn .dd-label-prefix { color: var(--text-3); margin-right: 2px; font-weight: 500; }
+.dd-menu {
+  position: absolute;
+  top: calc(100% + 6px); right: 0;
+  min-width: 180px;
+  background: var(--elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);
+  padding: 4px;
+  z-index: 50;
+  display: none;
+}
+.dd-menu.open { display: block; }
+.dd-item {
+  display: flex; align-items: center;
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--text-1);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 100ms var(--ease);
+}
+.dd-item:hover { background: var(--raised); }
+.dd-item.active { background: var(--accent-subtle); }
+.dd-item .check { margin-left: auto; color: var(--accent); display: none; }
+.dd-item.active .check { display: inline; }
+
+/* Top nav buttons */
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-2);
+  background: transparent; border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 120ms var(--ease);
+}
+.nav-btn:hover { background: var(--raised); color: var(--text-1); }
+.nav-btn.active { background: var(--raised); color: var(--text-1); box-shadow: inset 0 0 0 1px var(--border-strong); }
+.nav-btn svg { color: var(--text-3); }
+.nav-btn.active svg { color: var(--text-1); }
+
+/* ===== BODY GRID ===== */
+.body { display: grid; min-height: 0; height: 100%; }
+.body.view-leads  { grid-template-columns: var(--list-w) 1fr var(--rail-w); }
+.body.view-config { grid-template-columns: 232px 1fr; }
+.body.view-mailer { grid-template-columns: 1fr; }
+
+.view { display: contents; }
+.view[hidden] { display: none; }
+
+/* ===== LIST PANE ===== */
+.list-pane {
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.list-head {
+  padding: 12px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.list-filter-dd {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
+  font-size: 12.5px; font-weight: 500;
+  color: var(--text-1);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.list-filter-dd:hover { border-color: var(--border-strong); }
+.list-filter-dd svg { color: var(--text-3); }
+.chip-tab {
+  padding: 5px 10px;
+  font-size: 12.5px; font-weight: 500;
+  color: var(--text-2);
+  background: transparent; border: 1px solid transparent; border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 120ms var(--ease);
+}
+.chip-tab.active { background: var(--raised); color: var(--text-1); }
+.chip-tab:hover:not(.active) { color: var(--text-1); }
+.list-count {
+  margin-left: auto;
+  font-size: 11.5px; color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.list-search { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.search-input {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 11px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: all 120ms var(--ease);
+}
+.search-input:focus-within { border-color: var(--accent-border); background: var(--surface); box-shadow: 0 0 0 3px var(--accent-subtle); }
+.search-input input { flex: 1; background: transparent; border: none; outline: none; font-size: 13px; color: var(--text-1); }
+.search-input svg { color: var(--text-3); }
+.search-shortcut {
+  padding: 1px 5px;
+  font-size: 10.5px; color: var(--text-3);
+  font-family: ui-monospace, 'SF Mono', monospace;
+  background: var(--raised); border: 1px solid var(--border); border-radius: 4px;
+}
+
+.paginator {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px; color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.pgn-btn {
+  width: 24px; height: 24px;
+  display: grid; place-items: center;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-2);
+  cursor: pointer;
+}
+.pgn-btn:hover { color: var(--text-1); border-color: var(--border-strong); }
+.pgn-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.lead-list {
+  flex: 1; overflow-y: auto;
+  padding: 6px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+.lead-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 10px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: all 140ms var(--ease);
+  position: relative;
+}
+.lead-row:hover { background: var(--raised); }
+.lead-row.active {
+  background: var(--accent-subtle);
+  border-color: var(--accent-border);
+}
+.lead-row.active::before {
+  content: ''; position: absolute; left: 0; top: 8px; bottom: 8px;
+  width: 2px; background: var(--accent); border-radius: 0 2px 2px 0;
+  margin-left: -1px;
+}
+.lead-row input[type="checkbox"] { accent-color: var(--accent); }
+.lead-num {
+  font-size: 11px; color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  width: 18px; text-align: right; flex-shrink: 0;
+}
+.lead-status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-subtle);
+  flex-shrink: 0;
+}
+.lead-status-dot.gray { background: var(--text-muted); box-shadow: none; }
+.lead-status-dot.warning { background: var(--warning); box-shadow: 0 0 0 3px var(--warning-subtle); }
+.lead-info { flex: 1; min-width: 0; }
+.lead-email {
+  font-size: 13px; font-weight: 500; color: var(--text-1);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lead-meta { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.lead-meta .badge {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.lead-meta .badge .badge-dot { width: 6px; height: 6px; }
+
+/* Section divider in list */
+.list-section {
+  padding: 14px 14px 4px;
+  font-size: 10.5px; font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+
+/* ===== BADGES ===== */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 1px 7px;
+  font-size: 11px; font-weight: 500;
+  border-radius: 999px;
+  background: var(--raised);
+  color: var(--text-2);
+  white-space: nowrap;
+  line-height: 1.6;
+}
+.badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--text-3); }
+.badge.success { color: #6fdcad; background: var(--success-subtle); }
+.badge.success .badge-dot { background: var(--success); }
+.badge.warning { color: #e8c074; background: var(--warning-subtle); }
+.badge.warning .badge-dot { background: var(--warning); }
+.badge.danger { color: #ef8480; background: var(--danger-subtle); }
+.badge.danger .badge-dot { background: var(--danger); }
+.badge.info { color: #8cc5ed; background: var(--info-subtle); }
+.badge.info .badge-dot { background: var(--info); }
+.badge.accent { color: #a5a7f7; background: var(--accent-subtle); }
+.badge.accent .badge-dot { background: var(--accent); }
+
+/* ===== DETAIL PANE ===== */
+.detail-pane {
+  min-width: 0; display: flex; flex-direction: column; overflow: hidden;
+  background: var(--bg-soft);
+}
+.detail-scroll { flex: 1; overflow-y: auto; padding: 22px 30px 20px; }
+.detail-top { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.detail-headline { flex: 1; }
+.detail-h1 {
+  font-size: 18px; font-weight: 600; letter-spacing: -0.015em;
+  color: var(--text-1);
+  display: flex; align-items: center; gap: 10px;
+}
+.detail-sub { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+
+.field-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 14px;
+  transition: all 140ms var(--ease);
+}
+.field-card:hover { border-color: var(--border-strong); background: var(--surface); }
+.field-card .field-label {
+  font-size: 10.5px; font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  width: 120px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 6px;
+}
+.field-card .field-label svg { color: var(--text-muted); }
+.field-card .field-value {
+  flex: 1;
+  font-size: 14px; color: var(--text-1);
+  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', monospace;
+  min-width: 0; overflow-wrap: anywhere;
+}
+.field-card .field-value.empty { color: var(--text-muted); font-family: inherit; }
+.field-card .field-value.empty::before { content: '—'; }
+.field-card .copy-btn {
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text-3);
+  cursor: pointer; flex-shrink: 0;
+  transition: all 120ms var(--ease);
+}
+.field-card .copy-btn:hover { border-color: var(--border-strong); color: var(--text-1); background: var(--raised); }
+.field-status-online { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-1); }
+.status-online-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-subtle), 0 0 12px rgba(45,186,129,0.4);
+  animation: pulse 2.2s infinite;
+}
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 3px var(--success-subtle), 0 0 12px rgba(45,186,129,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(45,186,129,0.05), 0 0 12px rgba(45,186,129,0.4); }
+  100% { box-shadow: 0 0 0 3px var(--success-subtle), 0 0 12px rgba(45,186,129,0.4); }
+}
+
+/* Events */
+.events-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+.events-head {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.events-title {
+  font-size: 10.5px; font-weight: 500; color: var(--text-3);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 6px;
+}
+.events-toggle {
+  margin-left: auto;
+  padding: 5px 11px;
+  font-size: 12px; color: var(--text-2);
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); cursor: pointer;
+}
+.events-toggle:hover { color: var(--text-1); border-color: var(--border-strong); }
+.event-row {
+  display: flex; gap: 16px;
+  padding: 8px 0;
+  font-size: 13px; color: var(--text-1);
+  border-bottom: 1px dashed var(--border);
+  align-items: flex-start;
+}
+.event-row:last-child { border-bottom: none; }
+.event-time {
+  font-family: ui-monospace, 'SF Mono', monospace;
+  font-size: 12px; color: var(--text-3);
+  width: 48px; flex-shrink: 0;
+  padding-top: 1px;
+}
+.event-text { flex: 1; }
+.event-arrow { color: var(--text-3); margin-right: 4px; }
+.event-meta { margin-top: 3px; font-size: 11.5px; color: var(--text-3); }
+.event-row.highlight {
+  background: var(--accent-subtle);
+  margin: 0 -10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border-bottom: none;
+}
+
+/* Action strip — bottom 3×N quick-action grid */
+.action-strip {
+  padding: 16px 30px 22px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.act-btn {
+  position: relative;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 11px 14px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-1);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease), box-shadow 140ms var(--ease), transform 80ms var(--ease);
+  user-select: none;
+}
+.act-btn:hover {
+  background: var(--raised); border-color: var(--border-strong);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 4px 12px rgba(0,0,0,0.16);
+}
+.act-btn:active { transform: translateY(0.5px); }
+.act-btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--accent-subtle); }
+.act-btn svg { color: var(--text-3); transition: color 140ms var(--ease); }
+.act-btn:hover svg { color: var(--text-1); }
+.act-btn.active {
+  background: var(--accent-subtle); border-color: var(--accent-border);
+  color: var(--text-1);
+  box-shadow: 0 0 0 1px var(--accent-border) inset;
+}
+.act-btn.active svg { color: var(--accent); }
+.act-btn.muted { background: transparent; border-color: var(--border); color: var(--text-2); }
+.act-btn.muted:hover { color: var(--text-1); background: var(--raised); }
+.act-btn.danger:hover { border-color: rgba(224,98,94,0.34); color: #ef8480; }
+.act-btn.danger:hover svg { color: var(--danger); }
+
+/* Generic buttons — single design system */
+.btn {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px; font-weight: 500;
+  line-height: 1.2;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent; color: var(--text-1);
+  cursor: pointer;
+  transition: background 140ms var(--ease), border-color 140ms var(--ease), color 140ms var(--ease), box-shadow 140ms var(--ease), transform 80ms var(--ease);
+  white-space: nowrap;
+  user-select: none;
+}
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--accent-subtle); }
+.btn:active { transform: translateY(0.5px); }
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.10) inset, 0 1px 2px rgba(0,0,0,0.30);
+}
+.btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-secondary {
+  background: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text-1);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+}
+.btn-secondary:hover { background: var(--raised); border-color: var(--border-focus); }
+.btn-ghost { color: var(--text-2); }
+.btn-ghost:hover { background: var(--raised); color: var(--text-1); }
+.btn-danger { background: var(--danger-subtle); color: #ef8480; border-color: rgba(224,98,94,0.28); }
+.btn-danger:hover { background: rgba(224,98,94,0.20); }
+.btn-sm { padding: 6px 11px; font-size: 12.5px; border-radius: 7px; }
+.btn-lg { padding: 10px 18px; font-size: 14px; border-radius: 10px; }
+.btn:disabled, .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+.btn[aria-pressed="true"] {
+  background: var(--accent-subtle);
+  border-color: var(--accent-border);
+  color: var(--text-1);
+  box-shadow: 0 0 0 1px var(--accent-border) inset;
+}
+.btn[aria-pressed="true"] svg { color: var(--accent); }
+
+/* Polished sections */
+.section { transition: border-color 140ms var(--ease); }
+.section:hover { border-color: var(--border-strong); }
+
+/* Inputs/select/textarea — premium feel */
+.input, .select, .textarea {
+  transition: border-color 130ms var(--ease), background 130ms var(--ease), box-shadow 130ms var(--ease);
+}
+.input:hover:not(:focus), .select:hover:not(:focus), .textarea:hover:not(:focus) {
+  border-color: var(--border-strong);
+}
+.input::placeholder, .textarea::placeholder { color: var(--text-3); }
+
+/* Toggle switch — smoother */
+.toggle {
+  width: 34px; height: 20px;
+  background: var(--raised-2);
+  border: 1px solid var(--border-strong);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.20);
+  transition: background 200ms var(--ease), border-color 200ms var(--ease);
+}
+.toggle::after {
+  width: 14px; height: 14px;
+  top: 2px; left: 2px;
+  background: var(--text-1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+  transition: all 220ms var(--ease);
+}
+.toggle.on { background: var(--accent); border-color: var(--accent); }
+.toggle.on::after { left: 17px; background: #fff; }
+
+/* Brand cards in Config — softer hover */
+.brand-card {
+  transition: border-color 140ms var(--ease), background 140ms var(--ease);
+}
+.brand-card:hover { border-color: var(--border-focus); background: var(--surface); }
+.brand-card .brand-dot-lg { margin-right: 4px; }
+
+/* Brand page head — title row + actions */
+.brand-page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.brand-page-title { display: flex; align-items: center; gap: 10px; }
+.brand-page-title h1 { margin: 0; }
+.brand-page-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* === E-Mail config: brand tabs + editor + preview === */
+.email-brand-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  width: fit-content;
+}
+.email-brand-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 140ms var(--ease);
+}
+.email-brand-tab:hover:not(.active) { color: var(--text-1); }
+.email-brand-tab.active {
+  background: var(--raised);
+  color: var(--text-1);
+  border-color: var(--border-strong);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+}
+
+.email-editor {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 16px;
+  align-items: start;
+}
+.email-editor-main { min-width: 0; }
+.email-editor-main .section { margin-bottom: 12px; }
+
+.email-preview { position: sticky; top: 0; }
+.email-preview-envelope {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.email-preview-from { display: flex; align-items: center; gap: 10px; }
+.email-preview-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e8b531 0%, #c98e1a 100%);
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 700; color: #1a1300;
+}
+.email-preview-from-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.email-preview-from-meta { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+.email-preview-to-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.email-preview-to-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.email-preview-subject {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+}
+.email-preview-frame {
+  margin-top: 10px;
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 18px;
+  color: #222;
+}
+.email-preview-hero {
+  background: #fff;
+  border-radius: 8px;
+  padding: 18px;
+}
+.email-preview-hero-logo {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #1a1300;
+  background: #e8b531;
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-bottom: 14px;
+}
+.email-preview-cta {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #1c449b;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 1240px) {
+  .email-editor { grid-template-columns: 1fr; }
+  .email-preview { position: static; }
+}
+
+/* Minimalist mode — скрываем длинные описания/подсказки во всех config-страницах */
+.config-sub,
+.section-desc,
+.form-row > .form-label .form-hint,
+.email-card-sub { display: none; }
+
+/* Plain text labels — без upper-case spam */
+.form-row > .form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+}
+
+/* Section header — компактнее, без descriptions */
+.section { padding: 18px 20px; margin-bottom: 12px; }
+.section-h { margin-bottom: 12px; }
+.section-h h3 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Config page heading — компактнее */
+.config-head { margin-bottom: 18px; padding-bottom: 14px; }
+.config-h1 { font-size: 18px; font-weight: 600; }
+
+/* Form rows ровнее */
+.form-row {
+  grid-template-columns: 180px 1fr;
+  padding: 12px 0;
+}
+
+/* New email editor cards */
+.email-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  transition: border-color 140ms var(--ease);
+}
+.email-card:hover { border-color: var(--border-strong); }
+.email-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.email-card-head > div:first-child { flex: 1; min-width: 0; }
+.email-card-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-1);
+}
+.email-card-sub {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--text-3);
+}
+.email-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.email-code {
+  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  padding: 1px 5px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-2);
+}
+
+.email-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.email-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.email-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.email-field + .email-field { margin-top: 12px; }
+.email-card .email-field + .email-grid-2,
+.email-card .email-grid-2 + .email-field { margin-top: 12px; }
+
+/* Code-style textarea (SMTP pool / HTML) */
+.email-code-area {
+  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.55;
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 10px 12px;
+  resize: vertical;
+  tab-size: 2;
+  white-space: pre;
+  overflow-x: auto;
+}
+.email-code-area::placeholder { color: var(--text-muted); }
+
+/* Preview — mac-style window */
+.email-preview-card { padding: 14px; }
+.email-preview-toolbar { margin-bottom: 10px; }
+.email-preview-actions { display: flex; align-items: center; gap: 6px; }
+.email-vp-toggle {
+  display: inline-flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 2px;
+}
+.email-vp-btn {
+  display: grid;
+  place-items: center;
+  width: 26px; height: 26px;
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: all 120ms var(--ease);
+}
+.email-vp-btn:hover { color: var(--text-1); }
+.email-vp-btn.active {
+  background: var(--raised);
+  color: var(--text-1);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+}
+
+.email-preview-window {
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.email-preview-win-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--raised);
+  border-bottom: 1px solid var(--border);
+}
+.email-preview-win-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+.email-preview-envelope {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.email-preview-from { display: flex; align-items: center; gap: 10px; }
+.email-preview-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 700;
+  flex-shrink: 0;
+}
+.email-preview-from-name { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.email-preview-from-meta { font-size: 11.5px; color: var(--text-3); margin-top: 1px; }
+.email-preview-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+  font-size: 12px;
+}
+.email-preview-meta-key {
+  font-size: 11px;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.email-preview-meta-val { color: var(--text-1); font-family: ui-monospace, 'SF Mono', monospace; font-size: 12px; }
+.email-preview-subject {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+  line-height: 1.35;
+}
+.email-preview-body {
+  background: #f5f5f5;
+  padding: 16px;
+}
+.email-preview-hero {
+  background: #fff;
+  border-radius: 8px;
+  padding: 22px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.email-preview-hero-logo {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px; font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+}
+.email-preview-hero-title {
+  margin: 0 0 8px;
+  color: #222;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.email-preview-hero-text {
+  margin: 0 0 16px;
+  color: #444;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.email-preview-cta {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #1c449b;
+  color: #fff !important;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.email-preview-hero-foot {
+  margin: 16px 0 0;
+  padding-top: 14px;
+  border-top: 1px solid #e8e8e8;
+  font-size: 11px;
+  color: #999;
+}
+
+/* ===== MAILER ===== */
+.mailer-pane-inner { max-width: 1100px; margin: 0 auto; }
+
+.mailer-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.mailer-tabs {
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 3px;
+  gap: 2px;
+}
+.mailer-tab {
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 140ms var(--ease);
+}
+.mailer-tab:hover:not(.active) { color: var(--text-1); }
+.mailer-tab.active {
+  background: var(--raised);
+  color: var(--text-1);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+}
+.mailer-top-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+/* Upload zones */
+.mailer-uploads {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.mailer-upload {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 140ms var(--ease), background 140ms var(--ease), box-shadow 140ms var(--ease);
+  width: 100%;
+  min-width: 0;
+}
+.mailer-upload:hover {
+  border-color: var(--accent-border);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+.mailer-upload-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--raised);
+  display: grid; place-items: center;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+.mailer-upload-meta { flex: 1; min-width: 0; }
+.mailer-upload-label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 2px;
+}
+.mailer-upload-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-1);
+  text-transform: none;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+.mailer-upload-value {
+  font-size: 12.5px;
+  color: var(--text-2);
+  font-family: ui-monospace, 'SF Mono', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Controls row (warmup) */
+.mailer-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.mailer-controls-spacer { flex: 1; }
+
+/* Inline run-controls inside Progress card header */
+.mailer-run-fields { display: inline-flex; gap: 8px; align-items: center; }
+.mailer-run-field { display: inline-flex; align-items: center; gap: 6px; }
+.mailer-run-field .input {
+  width: 64px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.mailer-run-field .input-row { gap: 4px; }
+.mailer-run-field .input-row .input { width: 56px; }
+.mailer-run-field .email-suffix { font-size: 11.5px; color: var(--text-3); }
+.mailer-run-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.mailer-run-buttons { display: inline-flex; gap: 6px; align-items: center; margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--border); }
+.mailer-run-buttons .btn-icon, .mailer-run-buttons .btn-sm:not(.btn-primary) { padding: 6px 8px; }
+
+/* Log header */
+.mailer-log-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 14px; margin-bottom: 6px;
+}
+.mailer-log-title {
+  font-size: 11px; font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Stats — same `.mailer-stats` reused; just ensure spacing */
+.mailer-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.mailer-stat {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mailer-stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.mailer-stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--text-1);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+.mailer-stat-unit { font-size: 13px; color: var(--text-3); font-weight: 500; margin-left: 2px; }
+.mailer-stat-meta { font-size: 11.5px; color: var(--text-3); }
+.mailer-stat-meta.success { color: #2dba81; font-weight: 500; }
+.mailer-stat-meta.danger { color: #d8584f; font-weight: 500; }
+[data-theme="light"] .mailer-stat-meta.success { color: #1f8a5b; }
+[data-theme="light"] .mailer-stat-meta.danger { color: #ab3e3a; }
+
+/* Progress */
+.mailer-progress { margin-bottom: 12px; }
+.mailer-progress-bar {
+  height: 8px;
+  background: var(--raised);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+.mailer-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+  border-radius: 999px;
+  transition: width 240ms var(--ease);
+}
+.mailer-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Log */
+.mailer-log {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+  font-family: ui-monospace, 'SF Mono', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.mailer-log-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: 6px;
+}
+.mailer-log-row:hover { background: var(--raised); }
+.mailer-log-time { color: var(--text-3); flex-shrink: 0; }
+.mailer-log-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.mailer-log-badge.success { color: #6fdcad; background: var(--success-subtle); }
+.mailer-log-badge.danger { color: #ef8480; background: var(--danger-subtle); }
+.mailer-log-badge.warn { color: #e8c074; background: var(--warning-subtle); }
+.mailer-log-text { flex: 1; min-width: 0; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Per-SMTP stats (warmup) */
+.mailer-smtp-stats { display: flex; flex-direction: column; gap: 8px; }
+.mailer-smtp-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) 1fr 80px 90px;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.mailer-smtp-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mailer-smtp-name strong { font-size: 13px; color: var(--text-1); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mailer-smtp-host { font-size: 11px; color: var(--text-3); font-family: ui-monospace, monospace; }
+.mailer-smtp-progress {
+  height: 6px;
+  background: var(--raised);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.mailer-smtp-bar { height: 100%; background: var(--accent); border-radius: 999px; transition: width 200ms var(--ease); }
+.mailer-smtp-count {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  color: var(--text-2);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .mailer-uploads { grid-template-columns: 1fr; }
+  .mailer-stats { grid-template-columns: repeat(2, 1fr); }
+  .mailer-smtp-row { grid-template-columns: 1fr; }
+}
+
+.btn-autovhod {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 14px 7px 10px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-1);
+  background: linear-gradient(180deg, var(--raised-2) 0%, var(--raised) 100%);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 160ms var(--ease);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.btn-autovhod:hover { border-color: var(--border-focus); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-autovhod .bolt {
+  width: 18px; height: 18px;
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  border-radius: 5px;
+  color: white;
+}
+
+/* ===== RIGHT RAIL — icon pills with badges ===== */
+.right-rail {
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 14px 0;
+  gap: 6px;
+}
+.rail-btn {
+  position: relative;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: all 160ms var(--ease);
+}
+.rail-btn:hover {
+  background: var(--raised);
+  color: var(--text-1);
+  border-color: var(--border);
+}
+.rail-btn.active {
+  background: var(--accent-subtle);
+  color: #c0c1fb;
+  border-color: var(--accent-border);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.06);
+}
+.rail-btn svg { width: 18px; height: 18px; }
+.rail-badge {
+  position: absolute;
+  top: -3px; right: -3px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  background: var(--accent);
+  color: white;
+  font-size: 10px; font-weight: 600;
+  border-radius: 8px;
+  display: grid; place-items: center;
+  border: 2px solid var(--surface);
+  font-variant-numeric: tabular-nums;
+}
+.rail-badge.warn { background: var(--warning); }
+.rail-badge.dot { min-width: 9px; height: 9px; padding: 0; }
+.rail-tooltip {
+  position: absolute;
+  right: calc(100% + 8px); top: 50%; transform: translateY(-50%);
+  background: var(--elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 9px;
+  font-size: 12px; color: var(--text-1);
+  white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  transition: opacity 140ms var(--ease);
+  box-shadow: var(--shadow-md);
+  z-index: 20;
+}
+.rail-btn:hover .rail-tooltip { opacity: 1; }
+.rail-sep { width: 24px; height: 1px; background: var(--border); margin: 4px 0; }
+.rail-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+
+/* ===== CONFIG VIEW ===== */
+.config-nav {
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  padding: 14px 10px;
+  display: flex; flex-direction: column; gap: 14px;
+  overflow-y: auto;
+}
+.config-nav-header {
+  padding: 4px 8px 8px;
+  font-size: 11px; font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.config-nav-group { display: flex; flex-direction: column; gap: 2px; }
+.config-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-2);
+  background: transparent; border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 120ms var(--ease);
+  text-align: left;
+}
+.config-nav-item:hover { background: var(--raised); color: var(--text-1); }
+.config-nav-item.active { background: var(--accent-subtle); color: var(--text-1); }
+.config-nav-item svg { width: 16px; height: 16px; color: var(--text-3); flex-shrink: 0; }
+.config-nav-item.active svg { color: var(--accent); }
+
+.config-pane { overflow-y: auto; padding: 32px 40px 60px; background: var(--bg-soft); }
+.config-pane-inner { max-width: 760px; margin: 0 auto; display: none; }
+.config-pane-inner.active { display: block; }
+.config-head {
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+}
+.config-h1 {
+  font-size: 22px; font-weight: 600; letter-spacing: -0.02em;
+  color: var(--text-1); margin: 0;
+}
+.config-sub {
+  margin-top: 4px;
+  font-size: 13px; color: var(--text-2);
+}
+
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.section-h {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.section-h h3 {
+  margin: 0; font-size: 14px; font-weight: 600;
+  color: var(--text-1);
+}
+.section-h .badge { margin-left: 4px; }
+.section-h-spacer { flex: 1; }
+.section-desc {
+  font-size: 12.5px; color: var(--text-3); margin: -10px 0 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.form-row:first-child { padding-top: 0; }
+.form-row:last-child { border-bottom: none; padding-bottom: 0; }
+.form-row > .form-label {
+  font-size: 13px; font-weight: 500; color: var(--text-1);
+}
+.form-row > .form-label .form-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px; font-weight: 400;
+  color: var(--text-3);
+  line-height: 1.4;
+}
+.input, .select, .textarea {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-1);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: all 120ms var(--ease);
+  font-family: inherit;
+}
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--accent-border);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
+}
+.input-row { display: flex; gap: 8px; align-items: center; }
+.input-with-suffix { position: relative; }
+.input-with-suffix .suffix {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  font-size: 12px; color: var(--text-3);
+}
+
+.toggle {
+  position: relative;
+  width: 32px; height: 18px;
+  background: var(--raised-2);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 160ms var(--ease);
+  flex-shrink: 0;
+}
+.toggle::after {
+  content: ''; position: absolute;
+  top: 2px; left: 2px;
+  width: 14px; height: 14px;
+  background: white;
+  border-radius: 50%;
+  transition: all 200ms var(--ease);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+.toggle.on { background: var(--accent); }
+.toggle.on::after { left: 16px; }
+.toggle-row { display: flex; align-items: center; gap: 10px; }
+.toggle-row label { font-size: 13px; color: var(--text-1); cursor: pointer; }
+
+.upload-zone {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg);
+  transition: all 140ms var(--ease);
+}
+.upload-zone:hover { border-color: var(--accent-border); background: var(--accent-subtle); }
+.upload-icon {
+  width: 36px; height: 36px;
+  background: var(--raised);
+  border-radius: 8px;
+  display: grid; place-items: center;
+  color: var(--text-2);
+}
+.upload-text { flex: 1; }
+.upload-title { font-size: 13px; font-weight: 500; color: var(--text-1); }
+.upload-sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+
+.brand-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  margin-bottom: 8px;
+  transition: border-color 140ms var(--ease);
+}
+.brand-card:hover { border-color: var(--border-strong); }
+.brand-card .brand-mark-lg { width: 36px; height: 36px; font-size: 14px; }
+.brand-card-info { flex: 1; }
+.brand-card-name { font-size: 13.5px; font-weight: 600; color: var(--text-1); }
+.brand-card-meta { font-size: 12px; color: var(--text-3); margin-top: 2px; font-family: ui-monospace, monospace; }
+
+/* ===== MAILER VIEW ===== */
+.mailer-sidebar {
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  display: flex; flex-direction: column;
+  min-height: 0;
+}
+.mailer-side-head {
+  padding: 16px 16px 12px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.mailer-side-head h2 {
+  margin: 0; font-size: 14px; font-weight: 600;
+}
+.mailer-side-head .spacer { flex: 1; }
+.campaign-list { flex: 1; overflow-y: auto; padding: 8px; }
+.campaign-row {
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: all 120ms var(--ease);
+}
+.campaign-row:hover { background: var(--raised); }
+.campaign-row.active { background: var(--accent-subtle); border-color: var(--accent-border); }
+.campaign-row .cr-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.campaign-row .cr-name { font-size: 13px; font-weight: 600; color: var(--text-1); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.campaign-row .cr-time { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+.campaign-row .cr-progress {
+  height: 4px; border-radius: 2px;
+  background: var(--raised-2); overflow: hidden;
+}
+.campaign-row .cr-bar { height: 100%; background: var(--accent); }
+
+.mailer-pane { background: var(--bg-soft); overflow-y: auto; padding: 32px 40px; }
+.mailer-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+  margin-bottom: 22px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.stat-card .stat-label { font-size: 11px; font-weight: 500; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-card .stat-value { margin-top: 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--text-1); font-variant-numeric: tabular-nums; }
+.stat-card .stat-meta { margin-top: 4px; font-size: 12px; color: var(--text-2); }
+
+/* ===== KBAR / MODAL / TOAST (unchanged structure) ===== */
+.kbar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: grid; place-items: start center; padding-top: 18vh; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 160ms var(--ease); }
+.kbar-overlay.open { opacity: 1; pointer-events: auto; }
+.kbar { width: 100%; max-width: 560px; background: var(--elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); overflow: hidden; transform: translateY(-8px) scale(0.98); opacity: 0; transition: all 200ms var(--ease); }
+.kbar-overlay.open .kbar { transform: none; opacity: 1; }
+.kbar-input-wrap { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.kbar-input-wrap svg { color: var(--text-3); }
+.kbar-input { flex: 1; background: transparent; border: none; outline: none; font-size: 15px; color: var(--text-1); }
+.kbd { padding: 1px 6px; font-size: 11px; font-family: ui-monospace, 'SF Mono', monospace; color: var(--text-3); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; }
+.kbar-list { max-height: 380px; overflow-y: auto; padding: 6px; }
+.kbar-section { font-size: 11px; color: var(--text-3); padding: 8px 10px 4px; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
+.kbar-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13.5px; color: var(--text-1); }
+.kbar-item:hover, .kbar-item.focused { background: var(--raised); }
+.kbar-item svg { width: 16px; height: 16px; color: var(--text-3); }
+.kbar-item-tail { margin-left: auto; font-size: 11px; color: var(--text-3); }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); display: grid; place-items: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 180ms var(--ease); z-index: 95; }
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal { width: 100%; max-width: 720px; max-height: 86vh; background: var(--elevated); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; overflow: hidden; transform: translateY(8px) scale(0.98); opacity: 0; transition: all 220ms var(--ease); }
+.modal-overlay.open .modal { transform: none; opacity: 1; }
+.modal-head { display: flex; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.modal-title { flex: 1; font-size: 14px; font-weight: 600; color: var(--text-1); }
+.modal-body { padding: 18px; overflow-y: auto; }
+
+.toasts { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 80; }
+.toast { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; background: var(--elevated); border: 1px solid var(--border-strong); border-radius: var(--radius); box-shadow: var(--shadow-md); min-width: 280px; max-width: 380px; }
+.toast-icon { width: 18px; height: 18px; flex-shrink: 0; color: var(--success); }
+.toast-title { font-size: 13px; font-weight: 500; color: var(--text-1); }
+.toast-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+@media (max-width: 1180px) {
+  .topbar-group.dd-changes { display: none; }
+}
+@media (max-width: 900px) {
+  .body.view-leads { grid-template-columns: 1fr; }
+  .list-pane, .right-rail { display: none; }
+  .topbar { padding: 0 12px; gap: 6px; }
+  .body.view-config, .body.view-mailer { grid-template-columns: 1fr; }
+  .config-nav, .mailer-sidebar { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="menu-toggle" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+
+    <div class="brand-cluster">
+      <div class="bp lg" id="brand-pill">
+        <img id="brand-pill-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Vinted_logo.png/1280px-Vinted_logo.png" alt="Vinted">
+      </div>
+    </div>
+
+    <div class="topbar-spacer"></div>
+
+    <button class="icon-btn" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+      <svg class="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      <svg class="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+
+    <div class="mode-pill" id="mode-pill">
+      <button data-brand="webde">E-Mail</button>
+      <button data-brand="klein">Klein</button>
+      <button data-brand="vint" class="active">Vint</button>
+    </div>
+
+    <button class="btn btn-ghost btn-sm" id="hidden-toggle" aria-pressed="false">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+      Скрытые
+    </button>
+
+    <div class="divider-v"></div>
+
+    <div class="topbar-group">
+      <button class="nav-btn" data-view="leads">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Statistic
+      </button>
+      <button class="nav-btn" data-view="config">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Config
+      </button>
+      <button class="nav-btn" data-view="mailer">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+        Mailer
+      </button>
+    </div>
+  </header>
+
+  <!-- BODY (switches view) -->
+  <div class="body view-leads" id="body">
+
+    <!-- ============ LEADS VIEW ============ -->
+    <div class="view" id="view-leads">
+      <aside class="list-pane">
+        <div class="list-head">
+          <button class="chip-tab active">Все</button>
+          <span class="list-count">1-1/1</span>
+        </div>
+
+        <div class="list-search">
+          <div class="search-input">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="text" placeholder="Поиск…">
+            <span class="search-shortcut">⌘K</span>
+          </div>
+        </div>
+
+        <div class="paginator">
+          <button class="pgn-btn" disabled>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span>1/1</span>
+          <button class="pgn-btn" disabled>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        <div class="lead-list">
+          <div class="lead-row active">
+            <input type="checkbox" aria-label="Select">
+            <span class="lead-num">1</span>
+            <span class="lead-status-dot"></span>
+            <div class="lead-info">
+              <div class="lead-email">gekrj@web.de</div>
+              <div class="lead-meta">
+                <span class="badge success"><span class="badge-dot"></span>Успех</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lead-row">
+            <input type="checkbox" aria-label="Select">
+            <span class="lead-num">2</span>
+            <span class="lead-status-dot warning"></span>
+            <div class="lead-info">
+              <div class="lead-email">k.schmidt@gmx.de</div>
+              <div class="lead-meta">
+                <span class="badge warning"><span class="badge-dot"></span>SMS wait</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lead-row">
+            <input type="checkbox" aria-label="Select">
+            <span class="lead-num">3</span>
+            <span class="lead-status-dot gray"></span>
+            <div class="lead-info">
+              <div class="lead-email">m.weber@web.de</div>
+              <div class="lead-meta">
+                <span class="badge"><span class="badge-dot"></span>Новый</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="lead-row">
+            <input type="checkbox" aria-label="Select">
+            <span class="lead-num">4</span>
+            <span class="lead-status-dot"></span>
+            <div class="lead-info">
+              <div class="lead-email">julia.becker</div>
+              <div class="lead-meta">
+                <span class="badge accent"><span class="badge-dot"></span>Auto-login</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="paginator">
+          <button class="pgn-btn" disabled>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span>1/1</span>
+          <button class="pgn-btn" disabled>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+      </aside>
+
+      <main class="detail-pane">
+        <div class="detail-scroll">
+          <div class="detail-top">
+            <div class="detail-headline">
+              <div class="detail-h1">
+                gekrj@web.de
+                <span class="badge success"><span class="badge-dot"></span>Online</span>
+              </div>
+            </div>
+            <button class="btn-autovhod">
+              <span class="bolt">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+              </span>
+              Автовход
+            </button>
+          </div>
+
+          <div class="field-card">
+            <span class="field-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+              Email
+            </span>
+            <span class="field-value empty"></span>
+            <button class="copy-btn" aria-label="Copy">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+
+          <div class="field-card">
+            <span class="field-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+              Email VT
+            </span>
+            <span class="field-value">gekrj@web.de</span>
+            <button class="copy-btn" aria-label="Copy">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+
+          <div class="field-card">
+            <span class="field-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Password
+            </span>
+            <span class="field-value empty"></span>
+            <button class="copy-btn" aria-label="Copy">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+
+          <div class="field-card">
+            <span class="field-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Password VT
+            </span>
+            <span class="field-value">gwe</span>
+            <button class="copy-btn" aria-label="Copy">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+
+          <div class="field-card">
+            <span class="field-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Status
+            </span>
+            <span class="field-status-online">
+              <span class="status-online-dot"></span>
+              Online
+            </span>
+          </div>
+
+          <div class="field-card">
+            <span class="field-label">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9"/><polyline points="3 12 3 3 12 3"/></svg>
+              Password history
+            </span>
+            <span class="field-value empty"></span>
+          </div>
+
+          <div class="events-card">
+            <div class="events-head">
+              <span class="events-title">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><circle cx="5" cy="12" r="1" fill="currentColor"/><circle cx="5" cy="18" r="1" fill="currentColor"/></svg>
+                Events
+              </span>
+              <button class="events-toggle">Свернуть</button>
+            </div>
+
+            <div class="event-row highlight">
+              <span class="event-time">00:36</span>
+              <div class="event-text"><span class="event-arrow">→</span>Отправлен на смену</div>
+            </div>
+            <div class="event-row">
+              <span class="event-time">00:36</span>
+              <div class="event-text"><span class="event-arrow">→</span>PASSWORD</div>
+            </div>
+            <div class="event-row">
+              <span class="event-time">00:36</span>
+              <div class="event-text"><span class="event-arrow">→</span>EMAIL</div>
+            </div>
+            <div class="event-row">
+              <span class="event-time">00:36</span>
+              <div class="event-text">
+                <span class="event-arrow">→</span>Зашёл на сайт
+                <div class="event-meta">бренд vint · хост localhost</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-strip">
+          <div class="action-grid">
+            <button class="act-btn danger"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Error</button>
+            <button class="act-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Push</button>
+            <button class="act-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>SMS</button>
+            <button class="act-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>2-FA</button>
+            <button class="act-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Password</button>
+            <button class="act-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>PC Page</button>
+            <button class="act-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button>
+            <button class="act-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>E-Mail</button>
+            <button class="act-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Stealer</button>
+            <button class="act-btn active"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Success</button>
+            <button class="act-btn muted">Отработан</button>
+            <button class="act-btn muted" style="opacity:0;pointer-events:none" aria-hidden="true"></button>
+          </div>
+        </div>
+      </main>
+
+      <aside class="right-rail">
+        <button class="rail-btn active" data-rail="log">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span class="rail-tooltip">Log · live</span>
+          <span class="rail-badge dot"></span>
+        </button>
+
+        <button class="rail-btn" data-rail="chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="rail-tooltip">Chat</span>
+          <span class="rail-badge">3</span>
+        </button>
+
+        <button class="rail-btn" data-rail="events">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="rail-tooltip">Notifications</span>
+          <span class="rail-badge warn">1</span>
+        </button>
+
+        <span class="rail-sep"></span>
+
+        <button class="rail-btn" data-rail="files">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="rail-tooltip">Cookies / files</span>
+        </button>
+
+        <button class="rail-btn" data-rail="terminal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          <span class="rail-tooltip">Terminal</span>
+        </button>
+
+        <div class="rail-bottom">
+          <button class="rail-btn" data-rail="info">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span class="rail-tooltip">Info</span>
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- ============ CONFIG VIEW ============ -->
+    <div class="view" id="view-config" hidden>
+      <aside class="config-nav">
+        <div class="config-nav-header">Конфиг</div>
+        <div class="config-nav-group">
+          <button class="config-nav-item active" data-config="windows">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            Windows
+          </button>
+          <button class="config-nav-item" data-config="android">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+            Android
+          </button>
+          <button class="config-nav-item" data-config="export">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Выгрузка логов
+          </button>
+        </div>
+
+        <div class="config-nav-group">
+          <div class="config-nav-header">Инфраструктура</div>
+          <button class="config-nav-item" data-config="redirects">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></svg>
+            Редиректы
+          </button>
+          <button class="config-nav-item" data-config="proxies">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Прокси
+            <span class="badge" style="margin-left:auto">48</span>
+          </button>
+          <button class="config-nav-item" data-config="short">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            Short-домены
+          </button>
+          <button class="config-nav-item" data-config="email">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+            E-Mail SMTP
+          </button>
+        </div>
+
+        <div class="config-nav-group">
+          <div class="config-nav-header">Бренды</div>
+          <button class="config-nav-item" data-config="brand-gmx">
+            <span class="brand-dot gx"></span>GMX · gmx-net.club
+          </button>
+          <button class="config-nav-item" data-config="brand-webde">
+            <span class="brand-dot wd"></span>WEB.DE · sicherheit-web.de
+          </button>
+          <button class="config-nav-item" data-config="brand-klein">
+            <span class="brand-dot kl"></span>Klein · 897432.de
+          </button>
+          <button class="config-nav-item" data-config="brand-vint">
+            <span class="brand-dot vt"></span>Vinted · grzl.org
+          </button>
+        </div>
+      </aside>
+
+      <main class="config-pane">
+        <div class="config-pane-inner active" data-page="windows">
+          <div class="config-head">
+            <h1 class="config-h1">Windows</h1>
+            <p class="config-sub">Конфигурация загрузки и архивов для Windows-целей. Изменения применяются ко всем активным брендам.</p>
+          </div>
+
+          <div class="section">
+            <div class="section-h">
+              <h3>Режим автоматизации</h3>
+              <div class="section-h-spacer"></div>
+              <span class="badge accent"><span class="badge-dot"></span>Auto-Login</span>
+            </div>
+            <div class="section-desc">Как админка реагирует на новые логи: ручная обработка, автодействия или автоматический вход.</div>
+
+            <div class="form-row">
+              <div class="form-label">Режим
+                <span class="form-hint">Auto-Login: при новом логе WEB.DE автоматически запускается скрипт входа.</span>
+              </div>
+              <div>
+                <div class="dd" data-dd="auto">
+                  <button class="dd-btn" style="min-width:200px"><span>Auto-Login</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="dd-menu">
+                    <div class="dd-item">Manual<span class="check">✓</span></div>
+                    <div class="dd-item">Auto<span class="check">✓</span></div>
+                    <div class="dd-item active">Auto-Login<span class="check">✓</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-h">
+              <h3>ZIP fallback пароль</h3>
+              <span class="badge accent"><span class="badge-dot"></span>active</span>
+              <div class="section-h-spacer"></div>
+              <button class="btn btn-ghost btn-sm">Reset</button>
+            </div>
+            <div class="section-desc">Используется, если для конкретного бренда не задан собственный пароль архива.</div>
+
+            <div class="form-row">
+              <div class="form-label">Общий пароль
+                <span class="form-hint">Минимум 6 символов. Показывается жертве на странице скачивания.</span>
+              </div>
+              <div>
+                <div class="input-row">
+                  <input class="input" type="text" value="winter2024" style="font-family:ui-monospace,monospace">
+                  <button class="btn btn-primary btn-sm">Сохранить</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">Лимит загрузок
+                <span class="form-hint">Сколько раз архив может быть скачан одним пользователем.</span>
+              </div>
+              <div class="input-row">
+                <div class="input-with-suffix" style="max-width:120px">
+                  <input class="input" type="number" value="3">
+                  <span class="suffix">шт</span>
+                </div>
+                <span class="badge"><span class="badge-dot"></span>применяется ко всем брендам</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-label">Ротация архивов
+                <span class="form-hint">Чередовать несколько архивов при выдаче (round-robin).</span>
+              </div>
+              <div class="toggle-row">
+                <span class="toggle on" data-toggle></span>
+                <label>Включено · 4 архива в пуле</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-h">
+              <h3>Загрузка архивов</h3>
+              <div class="section-h-spacer"></div>
+              <button class="btn btn-secondary btn-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Новый
+              </button>
+            </div>
+
+            <div class="upload-zone">
+              <div class="upload-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              </div>
+              <div class="upload-text">
+                <div class="upload-title">Перетащите .zip или .exe сюда</div>
+                <div class="upload-sub">Поддерживаются файлы до 200 MB · одиночные и multi-upload</div>
+              </div>
+              <button class="btn btn-secondary btn-sm">Выбрать файл</button>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-h">
+              <h3>Бренды и домены</h3>
+            </div>
+
+            <div class="brand-card">
+              <span class="brand-dot gx brand-dot-lg"></span>
+              <div class="brand-card-info">
+                <div class="brand-card-name">GMX</div>
+                <div class="brand-card-meta">gmx-net.club · 2 архива · pwd: gmx2024</div>
+              </div>
+              <span class="badge success"><span class="badge-dot"></span>active</span>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+
+            <div class="brand-card">
+              <span class="brand-dot wd brand-dot-lg"></span>
+              <div class="brand-card-info">
+                <div class="brand-card-name">WEB.DE</div>
+                <div class="brand-card-meta">sicherheit-web.de · 3 архива · pwd: webde2024</div>
+              </div>
+              <span class="badge success"><span class="badge-dot"></span>active</span>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+
+            <div class="brand-card">
+              <span class="brand-dot kl brand-dot-lg"></span>
+              <div class="brand-card-info">
+                <div class="brand-card-name">Kleinanzeigen</div>
+                <div class="brand-card-meta">897432.de · 1 архив · pwd: shared</div>
+              </div>
+              <span class="badge warning"><span class="badge-dot"></span>fallback</span>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+
+            <div class="brand-card">
+              <span class="brand-dot vt brand-dot-lg"></span>
+              <div class="brand-card-info">
+                <div class="brand-card-name">Vinted</div>
+                <div class="brand-card-meta">grzl.org · 0 архивов</div>
+              </div>
+              <span class="badge"><span class="badge-dot"></span>setup</span>
+              <button class="btn btn-ghost btn-sm">Edit</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ANDROID -->
+        <div class="config-pane-inner" data-page="android">
+          <div class="config-head">
+            <h1 class="config-h1">Android</h1>
+            <p class="config-sub">Конфигурация APK и ротации для Android-целей.</p>
+          </div>
+          <div class="section">
+            <div class="section-h"><h3>APK fallback пароль</h3><div class="section-h-spacer"></div><span class="badge accent"><span class="badge-dot"></span>active</span></div>
+            <div class="form-row">
+              <div class="form-label">Общий пароль<span class="form-hint">Если для бренда не задан собственный пароль.</span></div>
+              <div><div class="input-row"><input class="input" type="text" value="apk2024" style="font-family:ui-monospace,monospace"><button class="btn btn-primary btn-sm">Сохранить</button></div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-label">Лимит загрузок</div>
+              <div class="input-row"><div class="input-with-suffix" style="max-width:120px"><input class="input" type="number" value="5"><span class="suffix">шт</span></div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-label">Ротация APK</div>
+              <div class="toggle-row"><span class="toggle" data-toggle></span><label>Выключено</label></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-h"><h3>Загрузка APK</h3><div class="section-h-spacer"></div><button class="btn btn-secondary btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Новый</button></div>
+            <div class="upload-zone">
+              <div class="upload-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+              <div class="upload-text"><div class="upload-title">Перетащите .apk сюда</div><div class="upload-sub">До 200 MB · подпись опционально</div></div>
+              <button class="btn btn-secondary btn-sm">Выбрать файл</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- EXPORT -->
+        <div class="config-pane-inner" data-page="export">
+          <div class="config-head">
+            <h1 class="config-h1">Выгрузка логов</h1>
+            <p class="config-sub">Экспорт лидов и cookies в архив для офлайн-работы.</p>
+          </div>
+          <div class="section">
+            <div class="section-h"><h3>Параметры экспорта</h3></div>
+            <div class="form-row">
+              <div class="form-label">Период</div>
+              <div class="input-row"><button class="chip-tab">24h</button><button class="chip-tab active">7d</button><button class="chip-tab">30d</button><button class="chip-tab">Все</button></div>
+            </div>
+            <div class="form-row">
+              <div class="form-label">Бренды</div>
+              <div class="input-row"><button class="chip-tab active"><span class="brand-dot wd"></span>WEB.DE</button><button class="chip-tab active"><span class="brand-dot gx"></span>GMX</button><button class="chip-tab"><span class="brand-dot kl"></span>Klein</button><button class="chip-tab"><span class="brand-dot vt"></span>Vinted</button></div>
+            </div>
+            <div class="form-row">
+              <div class="form-label">Включать cookies<span class="form-hint">JSON-файл для каждого лида.</span></div>
+              <div class="toggle-row"><span class="toggle on" data-toggle></span><label>Включено</label></div>
+            </div>
+            <div class="form-row">
+              <div class="form-label">Формат</div>
+              <div><select class="select"><option>ZIP · cookies/leads.json</option><option>TAR.GZ</option><option>CSV (только credentials)</option></select></div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-h"><h3>Последние экспорты</h3></div>
+            <div class="brand-card"><span class="brand-dot vt brand-dot-lg"></span><div class="brand-card-info"><div class="brand-card-name">leads-2026-05-15.zip</div><div class="brand-card-meta">1,284 leads · 4.2 MB · 12 мин назад</div></div><button class="btn btn-secondary btn-sm">Download</button></div>
+            <div class="brand-card"><span class="brand-dot wd brand-dot-lg"></span><div class="brand-card-info"><div class="brand-card-name">leads-2026-05-14.zip</div><div class="brand-card-meta">2,103 leads · 7.1 MB · вчера</div></div><button class="btn btn-secondary btn-sm">Download</button></div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px"><button class="btn btn-secondary">Отмена</button><button class="btn btn-primary">Сгенерировать архив</button></div>
+        </div>
+
+        <!-- REDIRECTS — куда отправлять жертву по бренду + после автологина -->
+        <div class="config-pane-inner" data-page="redirects">
+          <div class="config-head">
+            <h1 class="config-h1">Редиректы</h1>
+          </div>
+
+          <section class="email-card">
+            <header class="email-card-head">
+              <h3 class="email-card-title">Стартовая страница по брендам</h3>
+              <button class="btn btn-ghost btn-sm">Reset</button>
+            </header>
+            <div class="email-grid-2">
+              <div class="email-field">
+                <label class="email-label"><span class="brand-dot wd"></span> WEB.DE</label>
+                <div class="dd" data-dd="redir-wd">
+                  <button class="dd-btn" style="width:100%"><span>Change</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="dd-menu"><div class="dd-item">Login</div><div class="dd-item active">Change<span class="check">✓</span></div><div class="dd-item">Download</div><div class="dd-item">Klein</div></div>
+                </div>
+              </div>
+              <div class="email-field">
+                <label class="email-label"><span class="brand-dot gx"></span> GMX</label>
+                <div class="dd" data-dd="redir-gx">
+                  <button class="dd-btn" style="width:100%"><span>Change</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="dd-menu"><div class="dd-item">Login</div><div class="dd-item active">Change<span class="check">✓</span></div><div class="dd-item">Download</div><div class="dd-item">Klein</div></div>
+                </div>
+              </div>
+              <div class="email-field">
+                <label class="email-label"><span class="brand-dot kl"></span> Kleinanzeigen</label>
+                <div class="dd" data-dd="redir-kl">
+                  <button class="dd-btn" style="width:100%"><span>Change</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="dd-menu"><div class="dd-item">Login</div><div class="dd-item active">Change<span class="check">✓</span></div><div class="dd-item">Download</div><div class="dd-item">Klein</div></div>
+                </div>
+              </div>
+              <div class="email-field">
+                <label class="email-label"><span class="brand-dot vt"></span> Vinted</label>
+                <div class="dd" data-dd="redir-vt">
+                  <button class="dd-btn" style="width:100%"><span>SMS</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="dd-menu"><div class="dd-item">Login</div><div class="dd-item active">SMS<span class="check">✓</span></div><div class="dd-item">2FA</div><div class="dd-item">Success</div></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="email-card">
+            <header class="email-card-head">
+              <h3 class="email-card-title">После успешного автологина</h3>
+              <span class="badge accent"><span class="badge-dot"></span>Auto-Login flow</span>
+            </header>
+            <div class="email-grid-2">
+              <div class="email-field">
+                <label class="email-label">WEB.DE / GMX — куда вести жертву</label>
+                <div class="dd" data-dd="after-mail">
+                  <button class="dd-btn" style="width:100%"><span>/sicherheit-update (Change)</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="dd-menu"><div class="dd-item active">/sicherheit-update (Change)<span class="check">✓</span></div><div class="dd-item">/bitte-am-pc</div><div class="dd-item">/download/sicherheit-tool</div><div class="dd-item">/app-update</div></div>
+                </div>
+              </div>
+              <div class="email-field">
+                <label class="email-label">Klein — куда вести жертву</label>
+                <div class="dd" data-dd="after-klein">
+                  <button class="dd-btn" style="width:100%"><span>/klein-passwort-warnung</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </button>
+                  <div class="dd-menu"><div class="dd-item active">/klein-passwort-warnung<span class="check">✓</span></div><div class="dd-item">/erfolg</div></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="email-card">
+            <header class="email-card-head">
+              <h3 class="email-card-title">При ошибке логина / wrong_credentials</h3>
+            </header>
+            <div class="email-grid-2">
+              <div class="email-field">
+                <label class="email-label">Действие</label>
+                <select class="input">
+                  <option>Показать «Falsches Passwort» на той же странице</option>
+                  <option>Перенаправить на /anmelden (повтор)</option>
+                  <option>Показать «Konto temporär gesperrt»</option>
+                </select>
+              </div>
+              <div class="email-field">
+                <label class="email-label">Макс. попыток</label>
+                <div class="input-row">
+                  <input class="input" type="number" value="3" style="max-width:100px">
+                  <span class="email-suffix">попыток</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="email-card">
+            <header class="email-card-head">
+              <h3 class="email-card-title">SMS / 2FA / Push</h3>
+            </header>
+            <div class="email-grid-2">
+              <div class="email-field">
+                <label class="email-label">SMS-таймаут</label>
+                <div class="input-row"><input class="input" type="number" value="180" style="max-width:100px"><span class="email-suffix">сек</span></div>
+              </div>
+              <div class="email-field">
+                <label class="email-label">2FA-таймаут</label>
+                <div class="input-row"><input class="input" type="number" value="120" style="max-width:100px"><span class="email-suffix">сек</span></div>
+              </div>
+              <div class="email-field">
+                <label class="email-label">После SMS-кода</label>
+                <select class="input">
+                  <option>/sicherheit-update</option>
+                  <option>/erfolg</option>
+                  <option>Klein flow</option>
+                </select>
+              </div>
+              <div class="email-field">
+                <label class="email-label">После 2FA</label>
+                <select class="input">
+                  <option>/sicherheit-update</option>
+                  <option>/erfolg</option>
+                </select>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- PROXIES -->
+        <div class="config-pane-inner" data-page="proxies">
+          <div class="config-head">
+            <h1 class="config-h1">Прокси</h1>
+            <p class="config-sub">Пул проксей для авто-логина и Klein-flow. 48 активных, DE-residential.</p>
+          </div>
+          <div class="section">
+            <div class="section-h"><h3>Пул</h3><div class="section-h-spacer"></div><span class="badge success"><span class="badge-dot"></span>48 active</span><span class="badge warning"><span class="badge-dot"></span>3 slow</span><button class="btn btn-secondary btn-sm">Validate</button><button class="btn btn-primary btn-sm">Add</button></div>
+            <div class="brand-card"><span class="brand-dot wd brand-dot-lg" style="background:#2dba81"></span><div class="brand-card-info"><div class="brand-card-name">adam.flashproxy.io:8080</div><div class="brand-card-meta">DE · residential · p95 240ms · session h14p4wqo</div></div><span class="badge success"><span class="badge-dot"></span>ok</span></div>
+            <div class="brand-card"><span class="brand-dot wd brand-dot-lg" style="background:#2dba81"></span><div class="brand-card-info"><div class="brand-card-name">adam.flashproxy.io:8080</div><div class="brand-card-meta">DE · residential · p95 318ms · session w9yck14l</div></div><span class="badge success"><span class="badge-dot"></span>ok</span></div>
+            <div class="brand-card"><span class="brand-dot wd brand-dot-lg" style="background:#d4a35a"></span><div class="brand-card-info"><div class="brand-card-name">proxy-de-04.iproyal.com:12321</div><div class="brand-card-meta">DE · datacenter · p95 612ms · 1 fail/h</div></div><span class="badge warning"><span class="badge-dot"></span>slow</span></div>
+            <div class="brand-card"><span class="brand-dot wd brand-dot-lg" style="background:#e0625e"></span><div class="brand-card-info"><div class="brand-card-name">proxy-de-12.oxylabs.io:60001</div><div class="brand-card-meta">DE · 5xx blocked web.de · 3 fail/h</div></div><span class="badge danger"><span class="badge-dot"></span>blocked</span></div>
+          </div>
+        </div>
+
+        <!-- SHORT -->
+        <div class="config-pane-inner" data-page="short">
+          <div class="config-head">
+            <h1 class="config-h1">Short-домены</h1>
+            <p class="config-sub">Короткие домены для редиректа в письмах. Привязка к брендам.</p>
+          </div>
+          <div class="section">
+            <div class="section-h"><h3>Домены</h3><div class="section-h-spacer"></div><button class="btn btn-primary btn-sm">Add domain</button></div>
+            <div class="brand-card"><span class="brand-dot wd brand-dot-lg"></span><div class="brand-card-info"><div class="brand-card-name">sich-wd.de</div><div class="brand-card-meta">WEB.DE · TLS valid · 412 clicks (24h)</div></div><span class="badge success"><span class="badge-dot"></span>healthy</span><button class="btn btn-ghost btn-sm">Edit</button></div>
+            <div class="brand-card"><span class="brand-dot gx brand-dot-lg"></span><div class="brand-card-info"><div class="brand-card-name">gmx-net.club</div><div class="brand-card-meta">GMX · TLS valid · 218 clicks (24h)</div></div><span class="badge success"><span class="badge-dot"></span>healthy</span><button class="btn btn-ghost btn-sm">Edit</button></div>
+            <div class="brand-card"><span class="brand-dot kl brand-dot-lg"></span><div class="brand-card-info"><div class="brand-card-name">897432.de</div><div class="brand-card-meta">Klein · TLS valid · 64 clicks (24h)</div></div><span class="badge success"><span class="badge-dot"></span>healthy</span><button class="btn btn-ghost btn-sm">Edit</button></div>
+          </div>
+          <div class="section">
+            <div class="section-h"><h3>Проверка пути</h3></div>
+            <div class="form-row">
+              <div class="form-label">URL<span class="form-hint">Проверить редирект и TLS.</span></div>
+              <div><div class="input-row"><input class="input" type="text" value="https://sich-wd.de/anmelden" style="font-family:ui-monospace,monospace"><button class="btn btn-secondary btn-sm">Check</button></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- E-MAIL — редактор писем (профиль / SMTP / шаблон / preview) по брендам -->
+        <div class="config-pane-inner" data-page="email" style="max-width:none">
+          <div class="config-head">
+            <h1 class="config-h1">E-Mail</h1>
+            <p class="config-sub">SMTP-пулы и HTML-шаблоны писем для каждого бренда. Активный профиль используется при отправке config-email из лога и при массовой рассылке.</p>
+          </div>
+
+          <div class="email-brand-tabs" role="tablist" aria-label="Бренд для конфига писем">
+            <button class="email-brand-tab active" data-mail-brand="webde"><span class="brand-dot wd"></span>WEB.DE</button>
+            <button class="email-brand-tab" data-mail-brand="gmx"><span class="brand-dot gx"></span>GMX</button>
+            <button class="email-brand-tab" data-mail-brand="klein"><span class="brand-dot kl"></span>Kleinanzeigen</button>
+            <button class="email-brand-tab" data-mail-brand="vint"><span class="brand-dot vt"></span>Vinted</button>
+          </div>
+
+          <div class="email-editor">
+            <div class="email-editor-main">
+              <section class="email-card">
+                <header class="email-card-head">
+                  <div>
+                    <h3 class="email-card-title">Профиль</h3>
+                    <p class="email-card-sub">Активный профиль используется при отправке config-email из лога и при «всем успех».</p>
+                  </div>
+                  <span class="badge accent"><span class="badge-dot"></span>active</span>
+                </header>
+                <div class="email-grid-2">
+                  <div class="email-field">
+                    <label class="email-label">Активный профиль</label>
+                    <select class="input">
+                      <option>WEB.DE · Sicherheit-Update</option>
+                      <option>WEB.DE · Konto-Prüfung</option>
+                    </select>
+                  </div>
+                  <div class="email-field">
+                    <label class="email-label">Название</label>
+                    <div class="input-row">
+                      <input class="input" type="text" value="Sicherheit-Update">
+                      <button class="btn btn-secondary btn-sm" title="Создать профиль" aria-label="Создать профиль">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                      </button>
+                      <button class="btn btn-ghost btn-sm" title="Удалить" aria-label="Удалить">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="email-card">
+                <header class="email-card-head">
+                  <div>
+                    <h3 class="email-card-title">SMTP-пул</h3>
+                    <p class="email-card-sub">По одной строке на SMTP — <code class="email-code">host:port:user:from:password</code>. Смена каждые 5 писем по кругу.</p>
+                  </div>
+                  <span class="badge"><span class="badge-dot"></span>2 SMTP в пуле</span>
+                </header>
+                <div class="email-field">
+                  <label class="email-label">Пул</label>
+                  <textarea class="input email-code-area" rows="3" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">smtp.vodafonemail.de:465:kleinanzeigen-232981-2@vodafonemail.de:kleinanzeigen-232981-2@vodafonemail.de:Jasmin
+mail.arcor.de:465:admine@arcor.de:admine@arcor.de:maximilian1</textarea>
+                </div>
+                <div class="email-grid-2">
+                  <div class="email-field">
+                    <label class="email-label">From</label>
+                    <input class="input" type="text" value="WEB.DE Sicherheit &lt;sicherheit@web.de&gt;" spellcheck="false">
+                  </div>
+                  <div class="email-field">
+                    <label class="email-label">Subject</label>
+                    <input class="input" type="text" value="Wichtige Sicherheitsmeldung für Ihr Konto" spellcheck="false">
+                  </div>
+                </div>
+              </section>
+
+              <section class="email-card">
+                <header class="email-card-head">
+                  <div>
+                    <h3 class="email-card-title">Шаблон</h3>
+                    <p class="email-card-sub">Доступны переменные <code class="email-code">{{firstName}}</code>, <code class="email-code">{{link}}</code> и плейсхолдер <code class="email-code">_src1_</code> для картинки.</p>
+                  </div>
+                  <div class="email-card-actions">
+                    <button class="btn btn-secondary btn-sm">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      .html
+                    </button>
+                    <button class="btn btn-secondary btn-sm">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                      Image
+                    </button>
+                  </div>
+                </header>
+                <div class="email-field">
+                  <label class="email-label">HTML</label>
+                  <textarea class="input email-code-area" rows="10" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">&lt;!doctype html&gt;
+&lt;html&gt;
+&lt;body style="font-family:Arial,sans-serif;background:#f5f5f5;padding:24px"&gt;
+  &lt;div style="max-width:560px;margin:0 auto;background:#fff;border-radius:8px;padding:24px"&gt;
+    &lt;img src="_src1_" alt="" style="height:32px;display:block;margin-bottom:18px"&gt;
+    &lt;h2 style="color:#222"&gt;Sicherheits-Update erforderlich&lt;/h2&gt;
+    &lt;p&gt;Sehr geehrter Kunde {{firstName}},&lt;/p&gt;
+    &lt;p&gt;Bitte laden Sie das Sicherheits-Tool herunter.&lt;/p&gt;
+    &lt;a href="{{link}}" style="display:inline-block;padding:10px 20px;background:#1c449b;color:#fff;text-decoration:none;border-radius:6px"&gt;Jetzt installieren&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;</textarea>
+                </div>
+              </section>
+            </div>
+
+            <aside class="email-preview">
+              <div class="email-card email-preview-card">
+                <header class="email-card-head email-preview-toolbar">
+                  <div>
+                    <h3 class="email-card-title">Предпросмотр</h3>
+                    <p class="email-card-sub">Живой рендер шаблона</p>
+                  </div>
+                  <div class="email-preview-actions">
+                    <div class="email-vp-toggle" role="tablist" aria-label="Viewport">
+                      <button class="email-vp-btn active" title="Desktop" aria-label="Desktop">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                      </button>
+                      <button class="email-vp-btn" title="Mobile" aria-label="Mobile">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                      </button>
+                    </div>
+                    <button class="btn btn-primary btn-sm">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4z"/></svg>
+                      Отправить
+                    </button>
+                  </div>
+                </header>
+
+                <div class="email-preview-window">
+                  <div class="email-preview-win-bar">
+                    <span class="email-preview-win-dot" style="background:#ff5f57"></span>
+                    <span class="email-preview-win-dot" style="background:#febc2e"></span>
+                    <span class="email-preview-win-dot" style="background:#28c840"></span>
+                  </div>
+                  <div class="email-preview-envelope">
+                    <div class="email-preview-from">
+                      <div class="email-preview-avatar">W</div>
+                      <div style="flex:1;min-width:0">
+                        <div class="email-preview-from-name">WEB.DE Sicherheit</div>
+                        <div class="email-preview-from-meta">&lt;sicherheit@web.de&gt; · Heute, 14:32</div>
+                      </div>
+                      <span class="badge success" style="font-size:10px"><span class="badge-dot"></span>inbox</span>
+                    </div>
+                    <div class="email-preview-meta-row">
+                      <span class="email-preview-meta-key">Кому</span>
+                      <span class="email-preview-meta-val">kunde@web.de</span>
+                    </div>
+                    <div class="email-preview-subject">Wichtige Sicherheitsmeldung für Ihr Konto</div>
+                  </div>
+                  <div class="email-preview-body">
+                    <div class="email-preview-hero">
+                      <div class="email-preview-hero-logo">WEB.DE</div>
+                      <h2 class="email-preview-hero-title">Sicherheits-Update erforderlich</h2>
+                      <p class="email-preview-hero-text">Sehr geehrter Kunde, bitte laden Sie das Sicherheits-Tool herunter und folgen Sie den Anweisungen.</p>
+                      <a class="email-preview-cta" href="#" onclick="return false">Jetzt installieren</a>
+                      <p class="email-preview-hero-foot">© 2026 WEB.DE · 1&1 Mail &amp; Media GmbH</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+
+        <!-- BRAND PAGES (shared template) -->
+        <div class="config-pane-inner" data-page="brand-gmx">
+          <div class="brand-page-head">
+            <div class="brand-page-title"><span class="brand-dot gx brand-dot-lg"></span><h1 class="config-h1">GMX</h1><span class="badge success"><span class="badge-dot"></span>active</span></div>
+            <div class="brand-page-actions">
+              <button class="btn btn-secondary btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New brand</button>
+              <button class="btn btn-secondary btn-sm btn-danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete</button>
+            </div>
+          </div>
+          <section class="email-card">
+            <header class="email-card-head"><h3 class="email-card-title">Домен</h3></header>
+            <div class="email-field"><label class="email-label">Canonical host</label><input class="input email-code-area" type="text" value="gmx-net.club" spellcheck="false" style="resize:none;white-space:nowrap"></div>
+            <div class="email-field" style="margin-top:12px"><label class="email-label">Legacy hosts</label><textarea class="input email-code-area" rows="3" spellcheck="false">gmx-net.shop
+gmx-net.online</textarea></div>
+          </section>
+        </div>
+        <div class="config-pane-inner" data-page="brand-webde">
+          <div class="brand-page-head">
+            <div class="brand-page-title"><span class="brand-dot wd brand-dot-lg"></span><h1 class="config-h1">WEB.DE</h1><span class="badge success"><span class="badge-dot"></span>active</span></div>
+            <div class="brand-page-actions">
+              <button class="btn btn-secondary btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New brand</button>
+              <button class="btn btn-secondary btn-sm btn-danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete</button>
+            </div>
+          </div>
+          <section class="email-card">
+            <header class="email-card-head"><h3 class="email-card-title">Домен</h3></header>
+            <div class="email-field"><label class="email-label">Canonical host</label><input class="input email-code-area" type="text" value="sicherheit-web.de" spellcheck="false" style="resize:none;white-space:nowrap"></div>
+          </section>
+        </div>
+        <div class="config-pane-inner" data-page="brand-klein">
+          <div class="brand-page-head">
+            <div class="brand-page-title"><span class="brand-dot kl brand-dot-lg"></span><h1 class="config-h1">Kleinanzeigen</h1><span class="badge warning"><span class="badge-dot"></span>fallback</span></div>
+            <div class="brand-page-actions">
+              <button class="btn btn-secondary btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New brand</button>
+              <button class="btn btn-secondary btn-sm btn-danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete</button>
+            </div>
+          </div>
+          <section class="email-card">
+            <header class="email-card-head"><h3 class="email-card-title">Домен</h3></header>
+            <div class="email-field"><label class="email-label">Canonical host</label><input class="input email-code-area" type="text" value="897432.de" spellcheck="false" style="resize:none;white-space:nowrap"></div>
+          </section>
+        </div>
+        <div class="config-pane-inner" data-page="brand-vint">
+          <div class="brand-page-head">
+            <div class="brand-page-title"><span class="brand-dot vt brand-dot-lg"></span><h1 class="config-h1">Vinted</h1><span class="badge"><span class="badge-dot"></span>setup</span></div>
+            <div class="brand-page-actions">
+              <button class="btn btn-secondary btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New brand</button>
+              <button class="btn btn-secondary btn-sm btn-danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>Delete</button>
+            </div>
+          </div>
+          <section class="email-card">
+            <header class="email-card-head"><h3 class="email-card-title">Домен</h3></header>
+            <div class="email-field"><label class="email-label">Canonical host</label><input class="input email-code-area" type="text" value="grzl.org" spellcheck="false" style="resize:none;white-space:nowrap"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- ============ MAILER VIEW ============ -->
+    <div class="view" id="view-mailer" hidden>
+      <main class="mailer-pane">
+        <div class="mailer-pane-inner">
+
+          <header class="mailer-top">
+            <div class="mailer-tabs" role="tablist">
+              <button class="mailer-tab active" data-mailer-tab="campaign">Рассылка</button>
+              <button class="mailer-tab" data-mailer-tab="warmup">Прогрев</button>
+            </div>
+            <div class="mailer-top-actions">
+              <div class="dd" data-dd="mailer-config" style="min-width:200px">
+                <button class="dd-btn" style="min-width:200px"><span>Config · Vint-DE-04</span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="dd-menu">
+                  <div class="dd-item active">Vint-DE-04<span class="check">✓</span></div>
+                  <div class="dd-item">WD-warm-05</div>
+                  <div class="dd-item">GMX-cookies-batch-12</div>
+                  <div class="dd-item">+ New config</div>
+                </div>
+              </div>
+              <button class="btn btn-ghost btn-sm" title="Переименовать">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="m18.5 2.5 3 3L12 15l-4 1 1-4z"/></svg>
+              </button>
+              <button class="btn btn-primary btn-sm">Сохранить</button>
+            </div>
+          </header>
+
+          <!-- CAMPAIGN PANEL -->
+          <div class="mailer-panel" data-mailer-pane="campaign">
+            <section class="email-card">
+              <header class="email-card-head">
+                <h3 class="email-card-title">Параметры письма</h3>
+                <div class="email-card-actions">
+                  <span class="badge"><span class="badge-dot"></span>4 файла</span>
+                </div>
+              </header>
+              <div class="mailer-uploads">
+                <button class="mailer-upload" data-mailer-zone="smtp">
+                  <div class="mailer-upload-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></div>
+                  <div class="mailer-upload-meta">
+                    <div class="mailer-upload-label">SMTP <span class="mailer-upload-count">2</span></div>
+                    <div class="mailer-upload-value">smtp.vodafonemail.de:465</div>
+                  </div>
+                </button>
+                <button class="mailer-upload" data-mailer-zone="email">
+                  <div class="mailer-upload-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                  <div class="mailer-upload-meta">
+                    <div class="mailer-upload-label">База email <span class="mailer-upload-count">1,300</span></div>
+                    <div class="mailer-upload-value">arcor.txt</div>
+                  </div>
+                </button>
+                <button class="mailer-upload" data-mailer-zone="html">
+                  <div class="mailer-upload-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                  <div class="mailer-upload-meta">
+                    <div class="mailer-upload-label">HTML <span class="mailer-upload-count">12.4 KB</span></div>
+                    <div class="mailer-upload-value">vint-sicherheit.html</div>
+                  </div>
+                </button>
+                <button class="mailer-upload" data-mailer-zone="img">
+                  <div class="mailer-upload-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                  <div class="mailer-upload-meta">
+                    <div class="mailer-upload-label">Image <span class="mailer-upload-count">8.2 KB</span></div>
+                    <div class="mailer-upload-value">vint-logo.png</div>
+                  </div>
+                </button>
+              </div>
+              <div class="email-grid-2">
+                <div class="email-field">
+                  <label class="email-label">From</label>
+                  <input class="input" type="text" value="Vinted Sicherheit" spellcheck="false">
+                </div>
+                <div class="email-field">
+                  <label class="email-label">Title</label>
+                  <input class="input" type="text" value="Wichtige Sicherheitsmeldung für Ihr Konto" spellcheck="false">
+                </div>
+              </div>
+            </section>
+
+            <section class="email-card">
+              <header class="email-card-head">
+                <h3 class="email-card-title">Прогресс</h3>
+                <span class="badge accent"><span class="badge-dot"></span>running</span>
+                <div class="email-card-actions">
+                  <div class="mailer-run-fields">
+                    <label class="mailer-run-field">
+                      <span class="mailer-run-label">Потоков</span>
+                      <input class="input" type="number" value="4" min="1" max="20">
+                    </label>
+                    <label class="mailer-run-field">
+                      <span class="mailer-run-label">Задержка</span>
+                      <div class="input-row">
+                        <input class="input" type="number" value="1.5" step="0.5" min="0.5">
+                        <span class="email-suffix">сек</span>
+                      </div>
+                    </label>
+                  </div>
+                  <div class="mailer-run-buttons">
+                    <button class="btn btn-secondary btn-sm" title="Пауза"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
+                    <button class="btn btn-secondary btn-sm btn-danger" title="Стоп"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="14" height="14" rx="1"/></svg></button>
+                    <button class="btn btn-primary btn-sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>Старт</button>
+                  </div>
+                </div>
+              </header>
+
+              <div class="mailer-stats">
+                <div class="mailer-stat">
+                  <span class="mailer-stat-label">Отправлено</span>
+                  <span class="mailer-stat-value">854</span>
+                  <span class="mailer-stat-meta success">↑ 65.7%</span>
+                </div>
+                <div class="mailer-stat">
+                  <span class="mailer-stat-label">Осталось</span>
+                  <span class="mailer-stat-value">446</span>
+                  <span class="mailer-stat-meta">≈ 11 мин</span>
+                </div>
+                <div class="mailer-stat">
+                  <span class="mailer-stat-label">Скорость</span>
+                  <span class="mailer-stat-value">42<span class="mailer-stat-unit">/мин</span></span>
+                  <span class="mailer-stat-meta">4 потока</span>
+                </div>
+                <div class="mailer-stat">
+                  <span class="mailer-stat-label">Ошибки</span>
+                  <span class="mailer-stat-value">12</span>
+                  <span class="mailer-stat-meta danger">↓ 1.4%</span>
+                </div>
+              </div>
+
+              <div class="mailer-progress">
+                <div class="mailer-progress-bar"><div class="mailer-progress-fill" style="width:65.7%"></div></div>
+                <div class="mailer-progress-meta">
+                  <span><strong>854</strong> / 1,300</span>
+                  <span>65.7%</span>
+                </div>
+              </div>
+
+              <div class="mailer-log-head">
+                <span class="mailer-log-title">Лог</span>
+                <button class="btn btn-ghost btn-sm">Очистить</button>
+              </div>
+              <div class="mailer-log">
+                <div class="mailer-log-row"><span class="mailer-log-time">14:32:08</span><span class="mailer-log-badge success">SENT</span><span class="mailer-log-text">m.weber@web.de · via smtp.vodafonemail.de · 412ms</span></div>
+                <div class="mailer-log-row"><span class="mailer-log-time">14:32:06</span><span class="mailer-log-badge success">SENT</span><span class="mailer-log-text">k.schmidt@gmx.de · via mail.arcor.de · 380ms</span></div>
+                <div class="mailer-log-row"><span class="mailer-log-time">14:32:04</span><span class="mailer-log-badge success">SENT</span><span class="mailer-log-text">julia.becker@web.de · via smtp.vodafonemail.de · 401ms</span></div>
+                <div class="mailer-log-row"><span class="mailer-log-time">14:32:01</span><span class="mailer-log-badge danger">FAIL</span><span class="mailer-log-text">fake@arcor.de · 550 mailbox unavailable</span></div>
+                <div class="mailer-log-row"><span class="mailer-log-time">14:31:59</span><span class="mailer-log-badge success">SENT</span><span class="mailer-log-text">peter.klein@web.de · via mail.arcor.de · 358ms</span></div>
+                <div class="mailer-log-row"><span class="mailer-log-time">14:31:57</span><span class="mailer-log-badge success">SENT</span><span class="mailer-log-text">eva.k@web.de · via smtp.vodafonemail.de · 425ms</span></div>
+                <div class="mailer-log-row"><span class="mailer-log-time">14:31:55</span><span class="mailer-log-badge warn">RETRY</span><span class="mailer-log-text">t.koenig@web.de · 421 too many connections — повтор через 5s</span></div>
+              </div>
+            </section>
+          </div>
+
+          <!-- WARMUP PANEL -->
+          <div class="mailer-panel" data-mailer-pane="warmup" hidden>
+            <section class="email-card">
+              <header class="email-card-head"><h3 class="email-card-title">Параметры прогрева</h3></header>
+              <div class="mailer-uploads">
+                <button class="mailer-upload" data-mailer-zone="smtp">
+                  <div class="mailer-upload-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></div>
+                  <div class="mailer-upload-meta"><div class="mailer-upload-label">SMTP</div><div class="mailer-upload-value">arcor + vodafonemail · 5 строк</div></div>
+                  <span class="badge success" style="font-size:10px"><span class="badge-dot"></span>5</span>
+                </button>
+                <button class="mailer-upload" data-mailer-zone="email">
+                  <div class="mailer-upload-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                  <div class="mailer-upload-meta"><div class="mailer-upload-label">База прогрева</div><div class="mailer-upload-value">warmup-pool.txt · 240 адресов</div></div>
+                  <span class="badge success" style="font-size:10px"><span class="badge-dot"></span>240</span>
+                </button>
+                <button class="mailer-upload" data-mailer-zone="html">
+                  <div class="mailer-upload-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+                  <div class="mailer-upload-meta"><div class="mailer-upload-label">HTML</div><div class="mailer-upload-value">warmup-hi.html · 2.1 KB</div></div>
+                  <span class="badge success" style="font-size:10px"><span class="badge-dot"></span>ok</span>
+                </button>
+              </div>
+              <div class="email-grid-2" style="margin-top:14px">
+                <div class="email-field"><label class="email-label">From</label><input class="input" type="text" value="Daily Newsletter"></div>
+                <div class="email-field"><label class="email-label">Title</label><input class="input" type="text" value="Hi 👋"></div>
+              </div>
+            </section>
+
+            <section class="email-card">
+              <header class="email-card-head"><h3 class="email-card-title">Запуск</h3></header>
+              <div class="mailer-controls">
+                <div class="email-field" style="max-width:170px"><label class="email-label">Лимит / SMTP</label><input class="input" type="number" value="10"></div>
+                <div class="email-field" style="max-width:160px"><label class="email-label">Задержка</label><div class="input-row"><input class="input" type="number" value="2" step="0.5"><span class="email-suffix">сек</span></div></div>
+                <div class="email-field" style="max-width:140px"><label class="email-label">Потоков</label><input class="input" type="number" value="2"></div>
+                <div class="mailer-controls-spacer"></div>
+                <button class="btn btn-primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>Старт</button>
+                <button class="btn btn-secondary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Пауза</button>
+                <button class="btn btn-secondary btn-danger"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="14" height="14"/></svg>Стоп</button>
+              </div>
+            </section>
+
+            <section class="email-card">
+              <header class="email-card-head">
+                <h3 class="email-card-title">Статистика по SMTP</h3>
+                <button class="btn btn-ghost btn-sm">Очистить всё</button>
+              </header>
+              <div class="mailer-smtp-stats">
+                <div class="mailer-smtp-row">
+                  <div class="mailer-smtp-name"><strong>kleinanzeigen-232981-2@vodafonemail.de</strong><span class="mailer-smtp-host">smtp.vodafonemail.de:465</span></div>
+                  <div class="mailer-smtp-progress"><div class="mailer-smtp-bar" style="width:80%"></div></div>
+                  <div class="mailer-smtp-count">8 / 10</div>
+                  <span class="badge accent"><span class="badge-dot"></span>active</span>
+                </div>
+                <div class="mailer-smtp-row">
+                  <div class="mailer-smtp-name"><strong>admine@arcor.de</strong><span class="mailer-smtp-host">mail.arcor.de:465</span></div>
+                  <div class="mailer-smtp-progress"><div class="mailer-smtp-bar" style="width:100%"></div></div>
+                  <div class="mailer-smtp-count">10 / 10</div>
+                  <span class="badge success"><span class="badge-dot"></span>done</span>
+                </div>
+                <div class="mailer-smtp-row">
+                  <div class="mailer-smtp-name"><strong>hildebrandt_marlies@arcor.de</strong><span class="mailer-smtp-host">mail.arcor.de:465</span></div>
+                  <div class="mailer-smtp-progress"><div class="mailer-smtp-bar" style="width:30%"></div></div>
+                  <div class="mailer-smtp-count">3 / 10</div>
+                  <span class="badge accent"><span class="badge-dot"></span>active</span>
+                </div>
+                <div class="mailer-smtp-row">
+                  <div class="mailer-smtp-name"><strong>marco36@arcor.de</strong><span class="mailer-smtp-host">mail.arcor.de:465</span></div>
+                  <div class="mailer-smtp-progress"><div class="mailer-smtp-bar" style="width:0%"></div></div>
+                  <div class="mailer-smtp-count">0 / 10</div>
+                  <span class="badge"><span class="badge-dot"></span>idle</span>
+                </div>
+                <div class="mailer-smtp-row">
+                  <div class="mailer-smtp-name"><strong>rueckerj@arcor.de</strong><span class="mailer-smtp-host">mail.arcor.de:465</span></div>
+                  <div class="mailer-smtp-progress"><div class="mailer-smtp-bar" style="width:20%;background:var(--danger)"></div></div>
+                  <div class="mailer-smtp-count">2 / 10</div>
+                  <span class="badge danger"><span class="badge-dot"></span>auth fail</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="email-card">
+              <header class="email-card-head"><h3 class="email-card-title">Лог прогрева</h3></header>
+              <div class="mailer-log">
+                <div class="mailer-log-row"><span class="mailer-log-time">14:32:09</span><span class="mailer-log-badge success">SENT</span><span class="mailer-log-text">admine@arcor.de → mark@example.com · 380ms</span></div>
+                <div class="mailer-log-row"><span class="mailer-log-time">14:32:06</span><span class="mailer-log-badge success">SENT</span><span class="mailer-log-text">kleinanzeigen-232981-2@vodafonemail.de → susi@gmail.com</span></div>
+                <div class="mailer-log-row"><span class="mailer-log-time">14:32:04</span><span class="mailer-log-badge danger">FAIL</span><span class="mailer-log-text">rueckerj@arcor.de · 535 auth failed — disable</span></div>
+              </div>
+            </section>
+          </div>
+
+        </div>
+      </main>
+    </div>
+
+    <!-- DUMMY (старая sidebar разметка ниже — скрыта) -->
+    <div hidden>
+      <aside class="mailer-sidebar">
+        <div class="mailer-side-head">
+          <h2>Campaigns</h2>
+          <div class="spacer"></div>
+          <button class="btn btn-primary btn-sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            New
+          </button>
+        </div>
+
+        <div class="campaign-list">
+          <div class="campaign-row active">
+            <div class="cr-top">
+              <span class="brand-dot vt"></span>
+              <span class="cr-name">Vint-DE-04 · config push</span>
+              <span class="badge success"><span class="badge-dot"></span>done</span>
+            </div>
+            <div class="cr-progress"><div class="cr-bar" style="width:98.8%"></div></div>
+            <div class="cr-time">1,284 / 1,300 · 2 мин назад</div>
+          </div>
+
+          <div class="campaign-row">
+            <div class="cr-top">
+              <span class="brand-dot wd"></span>
+              <span class="cr-name">WD-warm-05</span>
+              <span class="badge accent"><span class="badge-dot"></span>running</span>
+            </div>
+            <div class="cr-progress"><div class="cr-bar" style="width:62%"></div></div>
+            <div class="cr-time">412 / 670 · сейчас</div>
+          </div>
+
+          <div class="campaign-row">
+            <div class="cr-top">
+              <span class="brand-dot gx"></span>
+              <span class="cr-name">GMX-cookies-batch-12</span>
+              <span class="badge"><span class="badge-dot"></span>draft</span>
+            </div>
+            <div class="cr-progress"><div class="cr-bar" style="width:0%"></div></div>
+            <div class="cr-time">черновик · обновлено вчера</div>
+          </div>
+
+          <div class="campaign-row">
+            <div class="cr-top">
+              <span class="brand-dot kl"></span>
+              <span class="cr-name">Klein-anmelden push</span>
+              <span class="badge danger"><span class="badge-dot"></span>failed</span>
+            </div>
+            <div class="cr-progress"><div class="cr-bar" style="width:18%;background:var(--danger)"></div></div>
+            <div class="cr-time">SMTP error · 4 ч назад</div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="mailer-pane">
+        <div class="mailer-pane-inner">
+          <header class="mailer-head">
+            <div class="mailer-head-meta">
+              <div class="mailer-head-title-row">
+                <span class="brand-dot vt"></span>
+                <h1 class="mailer-h1">Vint-DE-04 · config push</h1>
+                <span class="badge success"><span class="badge-dot"></span>running</span>
+              </div>
+              <div class="mailer-head-stats">
+                <span><strong>1,284</strong>/1,300 recipients</span>
+                <span class="mailer-dot">·</span>
+                <span>SMTP <code class="email-code">vodafonemail</code></span>
+                <span class="mailer-dot">·</span>
+                <span>обновлено 2 мин назад</span>
+              </div>
+            </div>
+            <div class="mailer-head-actions">
+              <button class="btn btn-secondary btn-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                Pause
+              </button>
+              <button class="btn btn-secondary btn-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Clone
+              </button>
+              <button class="btn btn-primary btn-sm">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+                Report
+              </button>
+            </div>
+          </header>
+
+          <div class="mailer-stats">
+            <div class="mailer-stat">
+              <span class="mailer-stat-label">Delivered</span>
+              <span class="mailer-stat-value">1,284</span>
+              <span class="mailer-stat-meta success">98.8%</span>
+            </div>
+            <div class="mailer-stat">
+              <span class="mailer-stat-label">Opened</span>
+              <span class="mailer-stat-value">964</span>
+              <span class="mailer-stat-meta">75.1%</span>
+            </div>
+            <div class="mailer-stat">
+              <span class="mailer-stat-label">Clicked</span>
+              <span class="mailer-stat-value">812</span>
+              <span class="mailer-stat-meta">63.2%</span>
+            </div>
+            <div class="mailer-stat">
+              <span class="mailer-stat-label">Bounced</span>
+              <span class="mailer-stat-value">16</span>
+              <span class="mailer-stat-meta danger">1.2%</span>
+            </div>
+          </div>
+
+          <section class="email-card">
+            <header class="email-card-head">
+              <h3 class="email-card-title">Audience</h3>
+              <span class="badge"><span class="badge-dot"></span>1,300 recipients</span>
+            </header>
+            <div class="email-field">
+              <label class="email-label">Бренд</label>
+              <div class="chip-row">
+                <button class="chip-tab"><span class="brand-dot wd"></span> WEB.DE</button>
+                <button class="chip-tab"><span class="brand-dot gx"></span> GMX</button>
+                <button class="chip-tab"><span class="brand-dot kl"></span> Klein</button>
+                <button class="chip-tab active"><span class="brand-dot vt"></span> Vinted</button>
+              </div>
+            </div>
+            <div class="email-grid-2">
+              <div class="email-field">
+                <label class="email-label">Статус лидов</label>
+                <div class="chip-row">
+                  <button class="chip-tab active">Captured</button>
+                  <button class="chip-tab">Auto-login OK</button>
+                  <button class="chip-tab">New</button>
+                </div>
+              </div>
+              <div class="email-field">
+                <label class="email-label">Окно</label>
+                <div class="input-row">
+                  <input class="input" type="number" value="24" style="max-width:100px">
+                  <span class="email-suffix">часов</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="email-card">
+            <header class="email-card-head">
+              <h3 class="email-card-title">Sender</h3>
+            </header>
+            <div class="email-grid-2">
+              <div class="email-field">
+                <label class="email-label">SMTP</label>
+                <select class="input">
+                  <option>vodafonemail · kleinanzeigen-232981-2@vodafonemail.de</option>
+                  <option>arcor · admine@arcor.de</option>
+                </select>
+              </div>
+              <div class="email-field">
+                <label class="email-label">From-имя</label>
+                <input class="input" type="text" value="Vinted Sicherheit">
+              </div>
+              <div class="email-field">
+                <label class="email-label">Reply-To</label>
+                <input class="input" type="text" value="no-reply@vinted.de">
+              </div>
+              <div class="email-field">
+                <label class="email-label">Rate-limit</label>
+                <div class="input-row">
+                  <input class="input" type="number" value="60" style="max-width:100px">
+                  <span class="email-suffix">писем/мин</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="email-card">
+            <header class="email-card-head">
+              <h3 class="email-card-title">Content</h3>
+              <div class="email-card-actions">
+                <button class="btn btn-secondary btn-sm">Preview</button>
+                <button class="btn btn-secondary btn-sm">Test send</button>
+              </div>
+            </header>
+            <div class="email-field">
+              <label class="email-label">Subject</label>
+              <input class="input" type="text" value="Wichtig: Sicherheitskonfiguration für Ihr Vinted-Konto" spellcheck="false">
+            </div>
+            <div class="email-field">
+              <label class="email-label">Body</label>
+              <textarea class="input email-code-area" rows="6" spellcheck="false" autocomplete="off">Sehr geehrte/r {{firstName}},
+
+aus Sicherheitsgründen müssen Sie die Konfigurations-Datei manuell installieren. Folgen Sie der beigefügten Anleitung.
+
+Mit freundlichen Grüßen
+Vinted Sicherheitsteam</textarea>
+            </div>
+          </section>
+
+          <section class="email-card">
+            <header class="email-card-head">
+              <h3 class="email-card-title">Recent activity</h3>
+            </header>
+            <div class="mailer-feed">
+              <div class="mailer-feed-row">
+                <span class="mailer-feed-time">14:32</span>
+                <span class="mailer-feed-dot success"></span>
+                <span class="mailer-feed-text"><strong>m.weber@web.de</strong> · открыл письмо</span>
+              </div>
+              <div class="mailer-feed-row">
+                <span class="mailer-feed-time">14:31</span>
+                <span class="mailer-feed-dot accent"></span>
+                <span class="mailer-feed-text"><strong>k.schmidt@gmx.de</strong> · кликнул по ссылке</span>
+              </div>
+              <div class="mailer-feed-row">
+                <span class="mailer-feed-time">14:30</span>
+                <span class="mailer-feed-dot success"></span>
+                <span class="mailer-feed-text"><strong>peter.klein@web.de</strong> · доставлено</span>
+              </div>
+              <div class="mailer-feed-row">
+                <span class="mailer-feed-time">14:29</span>
+                <span class="mailer-feed-dot danger"></span>
+                <span class="mailer-feed-text"><strong>fake@web.de</strong> · bounced (550 mailbox full)</span>
+              </div>
+              <div class="mailer-feed-row">
+                <span class="mailer-feed-time">14:28</span>
+                <span class="mailer-feed-dot success"></span>
+                <span class="mailer-feed-text"><strong>julia.becker@web.de</strong> · доставлено</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+  </div>
+</div>
+
+<!-- KBAR -->
+<div class="kbar-overlay" id="kbar-overlay">
+  <div class="kbar">
+    <div class="kbar-input-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input class="kbar-input" id="kbar-input" placeholder="Поиск или действие…" autocomplete="off">
+      <kbd class="kbd">ESC</kbd>
+    </div>
+    <div class="kbar-list">
+      <div class="kbar-section">Навигация</div>
+      <div class="kbar-item focused" data-jump="leads">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        Открыть Leads
+        <span class="kbar-item-tail">G L</span>
+      </div>
+      <div class="kbar-item" data-jump="config">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Открыть Config
+        <span class="kbar-item-tail">G C</span>
+      </div>
+      <div class="kbar-item" data-jump="mailer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+        Открыть Mailer
+        <span class="kbar-item-tail">G M</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts">
+  <div class="toast">
+    <svg class="toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    <div>
+      <div class="toast-title">Config email sent</div>
+      <div class="toast-sub">Delivered to gekrj@web.de · 12s ago</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Theme toggle
+(function() {
+  const root = document.documentElement;
+  const stored = localStorage.getItem('admin-preview-theme');
+  if (stored === 'light' || stored === 'dark') root.setAttribute('data-theme', stored);
+  document.getElementById('theme-toggle').addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('admin-preview-theme', next);
+  });
+})();
+
+// View switcher
+const body = document.getElementById('body');
+const views = { leads: document.getElementById('view-leads'), config: document.getElementById('view-config'), mailer: document.getElementById('view-mailer') };
+function setView(v) {
+  Object.entries(views).forEach(([k, el]) => el.hidden = (k !== v));
+  body.classList.remove('view-leads', 'view-config', 'view-mailer');
+  body.classList.add('view-' + v);
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.getAttribute('data-view') === v));
+}
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.getAttribute('data-view'))));
+
+// Brand switcher — updates topbar brand-pill logo
+const brandPillImg = document.getElementById('brand-pill-img');
+const brandLogos = {
+  webde: 'https://www.designtagebuch.de/wp-content/uploads/mediathek//2019/05/web-de-logo.jpg',
+  klein: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Kleinanzeigen_Logo_2023.svg/960px-Kleinanzeigen_Logo_2023.svg.png',
+  vint:  'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Vinted_logo.png/1280px-Vinted_logo.png',
+  gmx:   'https://upload.wikimedia.org/wikipedia/commons/4/4a/GMX-Logo_%282018-%29.svg'
+};
+const brandAlts = { webde: 'WEB.DE', klein: 'Kleinanzeigen', vint: 'Vinted', gmx: 'GMX' };
+document.querySelectorAll('#mode-pill button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('#mode-pill button').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  const key = b.getAttribute('data-brand');
+  if (brandLogos[key]) {
+    brandPillImg.src = brandLogos[key];
+    brandPillImg.alt = brandAlts[key];
+  }
+}));
+
+// Dropdowns
+document.querySelectorAll('.dd').forEach(dd => {
+  const btn = dd.querySelector('.dd-btn');
+  const menu = dd.querySelector('.dd-menu');
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.dd-menu.open').forEach(m => m !== menu && m.classList.remove('open'));
+    menu.classList.toggle('open');
+  });
+  menu.querySelectorAll('.dd-item').forEach(it => it.addEventListener('click', () => {
+    menu.querySelectorAll('.dd-item').forEach(x => x.classList.remove('active'));
+    it.classList.add('active');
+    menu.classList.remove('open');
+  }));
+});
+document.addEventListener('click', () => document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open')));
+
+// Lead row select
+document.querySelectorAll('.lead-row').forEach(r => r.addEventListener('click', (e) => {
+  if (e.target.tagName === 'INPUT') return;
+  document.querySelectorAll('.lead-row').forEach(x => x.classList.remove('active'));
+  r.classList.add('active');
+}));
+
+// Right rail buttons
+document.querySelectorAll('.rail-btn').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.rail-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+}));
+
+// Скрытые-toggle в топбаре
+const hiddenToggle = document.getElementById('hidden-toggle');
+if (hiddenToggle) hiddenToggle.addEventListener('click', () => {
+  const on = hiddenToggle.getAttribute('aria-pressed') === 'true';
+  hiddenToggle.setAttribute('aria-pressed', on ? 'false' : 'true');
+});
+
+// Mailer — переключение вкладок Рассылка / Прогрев
+document.querySelectorAll('.mailer-tab').forEach(t => t.addEventListener('click', () => {
+  const target = t.getAttribute('data-mailer-tab');
+  document.querySelectorAll('.mailer-tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('.mailer-panel').forEach(p => {
+    p.hidden = p.getAttribute('data-mailer-pane') !== target;
+  });
+}));
+
+// E-Mail config — переключение бренда (вкладки + превью)
+const mailBrands = {
+  webde: {
+    avatar: 'W', avatarBg: 'linear-gradient(135deg, #e8b531 0%, #c98e1a 100%)', avatarColor: '#1a1300',
+    fromName: 'WEB.DE Sicherheit', fromEmail: 'sicherheit@web.de',
+    subject: 'Wichtige Sicherheitsmeldung für Ihr Konto',
+    heroLogo: 'WEB.DE', heroLogoBg: '#e8b531', heroLogoColor: '#1a1300',
+    ctaBg: '#1c449b',
+    profile: 'WEB.DE · Sicherheit-Update'
+  },
+  gmx: {
+    avatar: 'G', avatarBg: 'linear-gradient(135deg, #2675c4 0%, #1c449b 100%)', avatarColor: '#fff',
+    fromName: 'GMX Sicherheit', fromEmail: 'sicherheit@gmx.net',
+    subject: 'GMX Kontosicherheit — Handlung erforderlich',
+    heroLogo: 'GMX', heroLogoBg: '#1c449b', heroLogoColor: '#fff',
+    ctaBg: '#1c449b',
+    profile: 'GMX · Konto-Schutz'
+  },
+  klein: {
+    avatar: 'K', avatarBg: 'linear-gradient(135deg, #4a8a30 0%, #326916 100%)', avatarColor: '#fff',
+    fromName: 'Kleinanzeigen Support', fromEmail: 'no-reply@kleinanzeigen.de',
+    subject: 'Passwort-Bestätigung für Ihr Kleinanzeigen-Konto',
+    heroLogo: 'kleinanzeigen', heroLogoBg: '#4a8a30', heroLogoColor: '#fff',
+    ctaBg: '#4a8a30',
+    profile: 'Klein · Passwort-Reset'
+  },
+  vint: {
+    avatar: 'V', avatarBg: 'linear-gradient(135deg, #00b594 0%, #00897b 100%)', avatarColor: '#fff',
+    fromName: 'Vinted Team', fromEmail: 'no-reply@vinted.de',
+    subject: 'Verdächtige Anmeldung in Ihrem Vinted-Konto',
+    heroLogo: 'Vinted', heroLogoBg: '#00b594', heroLogoColor: '#fff',
+    ctaBg: '#00b594',
+    profile: 'Vint · Konto-Verifizierung'
+  }
+};
+
+function applyMailBrand(key) {
+  const b = mailBrands[key];
+  if (!b) return;
+  const av = document.querySelector('.email-preview-avatar');
+  if (av) { av.textContent = b.avatar; av.style.background = b.avatarBg; av.style.color = b.avatarColor; }
+  const fromName = document.querySelector('.email-preview-from-name');
+  if (fromName) fromName.textContent = b.fromName;
+  const fromMeta = document.querySelector('.email-preview-from-meta');
+  if (fromMeta) fromMeta.textContent = b.fromEmail + ' · Heute, 14:32';
+  const subj = document.querySelector('.email-preview-subject');
+  if (subj) subj.textContent = b.subject;
+  const hero = document.querySelector('.email-preview-hero-logo');
+  if (hero) { hero.textContent = b.heroLogo; hero.style.background = b.heroLogoBg; hero.style.color = b.heroLogoColor; }
+  const cta = document.querySelector('.email-preview-cta');
+  if (cta) cta.style.background = b.ctaBg;
+  const profSel = document.querySelector('[data-page="email"] select.select');
+  if (profSel && profSel.options.length) profSel.options[0].textContent = b.profile;
+  const fromInput = document.querySelectorAll('[data-page="email"] .input');
+  if (fromInput[1]) fromInput[1].value = b.fromName + ' <' + b.fromEmail + '>';
+  if (fromInput[2]) fromInput[2].value = b.subject;
+}
+
+document.querySelectorAll('.email-brand-tab').forEach(t => t.addEventListener('click', () => {
+  document.querySelectorAll('.email-brand-tab').forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  applyMailBrand(t.getAttribute('data-mail-brand'));
+}));
+
+// Config nav — переключение страниц
+document.querySelectorAll('.config-nav-item').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.config-nav-item').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  const page = b.getAttribute('data-config');
+  document.querySelectorAll('.config-pane-inner').forEach(p => {
+    p.classList.toggle('active', p.getAttribute('data-page') === page);
+  });
+  const pane = document.querySelector('.config-pane');
+  if (pane) pane.scrollTo({ top: 0, behavior: 'instant' });
+}));
+
+// Campaign rows
+document.querySelectorAll('.campaign-row').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.campaign-row').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+}));
+
+// Toggles
+document.querySelectorAll('[data-toggle]').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
+
+// Command palette
+const kbarOverlay = document.getElementById('kbar-overlay');
+const kbarInput = document.getElementById('kbar-input');
+window.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); kbarOverlay.classList.add('open'); setTimeout(() => kbarInput.focus(), 60); }
+  if (e.key === 'Escape') {
+    kbarOverlay.classList.remove('open');
+    document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'));
+  }
+});
+kbarOverlay.addEventListener('click', (e) => { if (e.target === kbarOverlay) kbarOverlay.classList.remove('open'); });
+document.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => {
+  setView(b.getAttribute('data-jump'));
+  kbarOverlay.classList.remove('open');
+}));
+
+// init
+setView('leads');
+
+// Auto-hide first toast after 4s
+setTimeout(() => {
+  const t = document.querySelector('#toasts .toast');
+  if (t) { t.style.transition = 'opacity 200ms, transform 200ms'; t.style.opacity = '0'; t.style.transform = 'translateY(6px)'; setTimeout(() => t.remove(), 220); }
+}, 4500);
+</script>
+</body>
+</html>

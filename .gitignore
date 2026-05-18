@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+
+# Python (login automation)
+login/venv/
+login/__pycache__/
+login/klein_reset_debug/
+login/chrome-profiles/
+scripts/__pycache__/
+# локальный список прокси Klein (учётные данные)
+login/proxy_klein.txt
+# рантайм-счётчик round-robin отпечатков и флаг полной замены пула (не затирать при деплое)
+login/webde_fp_rr_counter.txt
+login/webde_replace_fp_all_done.flag
+
+# Local data (SQLite, exports, locks, logs)
+data/*.sqlite
+data/*.sqlite-*
+data/backups/
+data/webde-locks/
+data/*.lock
+data/debug.log
+data/*.log
+data/pm2-watch.state
+data/.dev-server-nohup.pid
+data/replaced-lead-ids.json
+data/admin-sidebar-last-hide.json
+data/all.txt
+# рантайм-JSON / секреты оператора (в git — только *.example)
+data/leads.json
+data/chat.json
+data/mode.json
+data/saved-credentials.json
+data/cookies-exported.json
+data/config-email.json
+data/warmup-email.json
+data/warmup-smtp-stats.json
+data/zip-passwords.json
+data/mailer-campaign-snapshot.json
+data/mailer-campaign-recipients.json
+data/mailer-campaign-recipients.json.tmp
+data/stealer-email.json
+data/*.legacy.bak
+data/data.backup-*
+data.backup-*/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+config/.env
+config/.env.local
+config/.env.*.local
+
+# OS / editor / local artifacts
+.DS_Store
+*.swp
+*~
+cursor-sandbox-apparmor.deb
+
+# Runtime
+server.pid
+server.log
+*.log
+
+# WebDE script lock files (if created outside data/webde-locks)
+**/*.lock
+# Локальные импорты / снимки (не версионировать)
+_import/
+
+# Локальная копия админки и прочие корневые бэкапы
+/backups/

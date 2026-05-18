@@ -1,0 +1,226 @@
+/* Header switch + lightweight visual deltas for admin UI modes. */
+
+:root {
+  --admin-vint-accent: #04727e;
+  --admin-vint-accent-hover: #03606b;
+  --admin-vint-accent-hover-light: #045f6a;
+  --admin-vint-accent-active: #024d56;
+  --admin-vint-accent-rgb: 4, 114, 126;
+  --admin-vint-state-text-dark: #e6fbfd;
+  --admin-vint-state-text-light: #0d525a;
+  --admin-vint-badge-text-light: #0f5c65;
+  --admin-vint-header-accent-light: #046975;
+
+  --admin-klein-accent: #b5e941;
+  --admin-klein-accent-hover: #a2d13a;
+  --admin-klein-accent-hover-light: #9ec83a;
+  --admin-klein-accent-rgb: 181, 233, 65;
+  --admin-klein-accent-soft-rgb: 178, 227, 63;
+  --admin-klein-accent-light-rgb: 171, 217, 63;
+  --admin-klein-deep-accent: #326916;
+  --admin-klein-deep-accent-rgb: 50, 105, 22;
+  --admin-klein-text-strong: #1d4b00;
+  --admin-klein-text-dark: #1f4f06;
+  --admin-klein-text-light: #23550c;
+  --admin-klein-badge-text-light: #2b6114;
+  --admin-klein-border-dark: #6c9a28;
+  --admin-klein-border-light: #5f8d24;
+  --admin-klein-soft-accent: #e1d1ff;
+  --admin-klein-soft-accent-rgb: 225, 209, 255;
+  --admin-klein-light-tint: #f0f7e6;
+  --admin-klein-light-tint-rgb: 240, 247, 230;
+  --admin-klein-border-mix-light: #cde3b3;
+
+  --admin-email-hover-rgb: 108, 99, 232;
+  --admin-email-hover-light-rgb: 92, 83, 214;
+  --admin-email-hover-border: #8b7ff1;
+  --admin-email-hover-border-light: #6e64db;
+}
+
+body.admin-ui-mode-vint {
+  --accent: var(--admin-vint-accent);
+  --accent-hover: var(--admin-vint-accent-hover);
+  --accent-muted: rgba(var(--admin-vint-accent-rgb), 0.25);
+  --admin-mode-btn-hover-fill: rgba(255, 255, 255, 0.08);
+  --btn-hover-fill-soft: rgba(var(--admin-vint-accent-rgb), 0.13);
+  --btn-hover-fill-soft-ghost: rgba(var(--admin-vint-accent-rgb), 0.09);
+  --btn-hover-fill-icon: rgba(var(--admin-vint-accent-rgb), 0.13);
+  --btn-hover-border-accent: var(--admin-vint-accent);
+  --state-selected-bg: rgba(var(--admin-vint-accent-rgb), 0.28);
+  --state-selected-border: color-mix(in srgb, var(--admin-vint-accent) 68%, #93dbe2);
+  --state-selected-text: var(--admin-vint-state-text-dark);
+  --badge-brand-bg: rgba(var(--admin-vint-accent-rgb), 0.24);
+  --badge-brand-text: var(--admin-vint-state-text-dark);
+  --badge-brand-border: rgba(var(--admin-vint-accent-rgb), 0.56);
+  --header-accent: var(--admin-vint-accent);
+  --header-menu-highlight: rgba(var(--admin-vint-accent-rgb), 0.19);
+  --chat-unread-bg: color-mix(in srgb, var(--admin-vint-accent) 88%, #022d32);
+  --chat-unread-text: #f3feff;
+  --chat-unread-border: color-mix(in srgb, var(--admin-vint-accent) 72%, #80d2dc);
+  --mode-primary-bg: var(--admin-vint-accent);
+  --mode-primary-active: var(--admin-vint-accent-active);
+  --mode-primary-text: #f3feff;
+  --mode-primary-focus: rgba(var(--admin-vint-accent-rgb), 0.55);
+}
+
+html.light body.admin-ui-mode-vint {
+  --accent: var(--admin-vint-accent);
+  --accent-hover: var(--admin-vint-accent-hover-light);
+  --accent-muted: rgba(var(--admin-vint-accent-rgb), 0.18);
+  --admin-mode-btn-hover-fill: rgba(255, 255, 255, 0.12);
+  --btn-hover-fill-soft: rgba(var(--admin-vint-accent-rgb), 0.1);
+  --btn-hover-fill-soft-ghost: rgba(var(--admin-vint-accent-rgb), 0.07);
+  --btn-hover-fill-icon: rgba(var(--admin-vint-accent-rgb), 0.1);
+  --btn-hover-border-accent: color-mix(in srgb, var(--admin-vint-accent) 86%, #02484f);
+  --state-selected-bg: rgba(var(--admin-vint-accent-rgb), 0.16);
+  --state-selected-border: rgba(var(--admin-vint-accent-rgb), 0.42);
+  --state-selected-text: var(--admin-vint-state-text-light);
+  --badge-brand-bg: rgba(var(--admin-vint-accent-rgb), 0.14);
+  --badge-brand-text: var(--admin-vint-badge-text-light);
+  --badge-brand-border: rgba(var(--admin-vint-accent-rgb), 0.33);
+  --header-accent: var(--admin-vint-header-accent-light);
+  --header-menu-highlight: rgba(var(--admin-vint-accent-rgb), 0.12);
+  --chat-unread-bg: color-mix(in srgb, var(--admin-vint-accent) 78%, #0c4850);
+  --chat-unread-text: #f5feff;
+  --chat-unread-border: rgba(var(--admin-vint-accent-rgb), 0.46);
+}
+
+body.admin-ui-mode-klein {
+  --accent: color-mix(in srgb, var(--admin-klein-accent) 86%, #fff16b);
+  --accent-hover: var(--admin-klein-accent-hover);
+  --accent-muted: rgba(var(--admin-klein-accent-soft-rgb), 0.24);
+  --admin-mode-btn-hover-fill: rgba(29, 75, 0, 0.08);
+  --btn-hover-fill-soft: rgba(var(--admin-klein-accent-soft-rgb), 0.18);
+  --btn-hover-fill-soft-ghost: rgba(var(--admin-klein-accent-soft-rgb), 0.13);
+  --btn-hover-fill-icon: rgba(var(--admin-klein-accent-soft-rgb), 0.18);
+  --btn-hover-border-accent: var(--admin-klein-deep-accent);
+  --klein-soft-accent: var(--admin-klein-soft-accent);
+  --state-selected-bg: color-mix(in srgb, rgba(var(--admin-klein-accent-soft-rgb), 0.32) 72%, var(--klein-soft-accent));
+  --state-selected-border: var(--admin-klein-border-dark);
+  --state-selected-text: var(--admin-klein-text-dark);
+  --badge-brand-bg: rgba(var(--admin-klein-accent-soft-rgb), 0.3);
+  --badge-brand-text: var(--admin-klein-text-dark);
+  --badge-brand-border: rgba(var(--admin-klein-deep-accent-rgb), 0.68);
+  --header-accent: var(--admin-klein-accent);
+  --header-menu-highlight: rgba(var(--admin-klein-accent-soft-rgb), 0.22);
+  --mode-primary-bg: var(--admin-klein-accent);
+  --mode-primary-active: var(--admin-klein-accent-hover);
+  --mode-primary-text: var(--admin-klein-text-strong);
+  --mode-primary-focus: var(--admin-klein-deep-accent);
+}
+
+body.admin-ui-mode-klein .header-btn-label:has(input:checked),
+body.admin-ui-mode-vint .header-btn-label:has(input:checked),
+body:is(.admin-ui-mode-klein, .admin-ui-mode-vint) .btn-primary {
+  background: var(--mode-primary-bg);
+  border-color: var(--mode-primary-bg);
+  color: var(--mode-primary-text);
+}
+
+body:is(.admin-ui-mode-klein, .admin-ui-mode-vint) .btn-primary:hover {
+  background: linear-gradient(var(--admin-mode-btn-hover-fill), var(--admin-mode-btn-hover-fill)), var(--mode-primary-bg);
+  border-color: var(--mode-primary-bg);
+}
+
+body:is(.admin-ui-mode-klein, .admin-ui-mode-vint) .btn-primary:active {
+  background: var(--mode-primary-active);
+  border-color: var(--mode-primary-active);
+}
+
+body.admin-ui-mode-klein .header-btn-label:has(input:focus-visible),
+body.admin-ui-mode-vint .header-btn-label:has(input:focus-visible),
+body:is(.admin-ui-mode-klein, .admin-ui-mode-vint) .btn-primary:focus-visible {
+  outline: 2px solid var(--mode-primary-focus);
+  outline-offset: 2px;
+}
+
+html.light body.admin-ui-mode-klein {
+  --accent: color-mix(in srgb, var(--admin-klein-accent-hover-light) 84%, #ffffff);
+  --accent-hover: var(--admin-klein-accent-hover-light);
+  --accent-muted: rgba(var(--admin-klein-accent-light-rgb), 0.26);
+  --admin-mode-btn-hover-fill: rgba(29, 75, 0, 0.11);
+  --btn-hover-fill-soft: rgba(var(--admin-klein-deep-accent-rgb), 0.13);
+  --btn-hover-fill-soft-ghost: rgba(var(--admin-klein-deep-accent-rgb), 0.09);
+  --btn-hover-fill-icon: rgba(var(--admin-klein-deep-accent-rgb), 0.13);
+  --btn-hover-border-accent: var(--admin-klein-deep-accent);
+  --state-selected-bg: color-mix(in srgb, rgba(var(--admin-klein-accent-light-rgb), 0.32) 68%, var(--admin-klein-light-tint));
+  --state-selected-border: var(--admin-klein-border-light);
+  --state-selected-text: var(--admin-klein-text-light);
+  --badge-brand-bg: color-mix(in srgb, rgba(var(--admin-klein-accent-light-rgb), 0.32) 78%, #ffffff);
+  --badge-brand-text: var(--admin-klein-badge-text-light);
+  --badge-brand-border: color-mix(in srgb, var(--admin-klein-deep-accent) 42%, var(--admin-klein-border-mix-light));
+  --header-accent: var(--admin-klein-deep-accent);
+  --header-menu-highlight: color-mix(in srgb, var(--admin-klein-soft-accent) 36%, var(--admin-klein-light-tint));
+}
+
+body.admin-ui-mode-email {
+  --state-selected-bg: color-mix(in srgb, var(--accent-muted) 92%, transparent);
+  --state-selected-border: color-mix(in srgb, var(--accent) 80%, var(--border));
+  --state-selected-text: color-mix(in srgb, var(--accent) 86%, #eef3ff);
+  --badge-brand-bg: color-mix(in srgb, var(--accent-muted) 92%, transparent);
+  --badge-brand-text: color-mix(in srgb, var(--accent) 90%, #eef3ff);
+  --badge-brand-border: color-mix(in srgb, var(--accent) 56%, var(--border));
+  --btn-hover-fill-soft: rgba(var(--admin-email-hover-rgb), 0.16);
+  --btn-hover-fill-soft-ghost: rgba(var(--admin-email-hover-rgb), 0.12);
+  --btn-hover-fill-icon: rgba(var(--admin-email-hover-rgb), 0.16);
+  --btn-hover-border-accent: var(--admin-email-hover-border);
+}
+
+html.light body.admin-ui-mode-email {
+  --state-selected-bg: color-mix(in srgb, var(--accent-muted) 92%, #ffffff);
+  --state-selected-border: color-mix(in srgb, var(--accent) 64%, #dbe2f0);
+  --state-selected-text: color-mix(in srgb, var(--accent) 90%, #1f355a);
+  --badge-brand-bg: color-mix(in srgb, var(--accent-muted) 95%, #ffffff);
+  --badge-brand-text: color-mix(in srgb, var(--accent) 92%, #1d3152);
+  --badge-brand-border: color-mix(in srgb, var(--accent) 50%, #ccd6e9);
+  --btn-hover-fill-soft: rgba(var(--admin-email-hover-light-rgb), 0.13);
+  --btn-hover-fill-soft-ghost: rgba(var(--admin-email-hover-light-rgb), 0.09);
+  --btn-hover-fill-icon: rgba(var(--admin-email-hover-light-rgb), 0.13);
+  --btn-hover-border-accent: var(--admin-email-hover-border-light);
+}
+
+html.light body.admin-ui-mode-klein .header-mode-menu {
+  background: color-mix(in srgb, #ffffff 90%, var(--admin-klein-soft-accent));
+  border-color: color-mix(in srgb, var(--admin-klein-deep-accent) 14%, var(--admin-klein-soft-accent));
+}
+
+body.admin-ui-mode-klein .header-mode-item:hover,
+body.admin-ui-mode-klein .header-mode-item.active {
+  background: color-mix(in srgb, var(--klein-soft-accent) 38%, var(--accent-muted));
+}
+
+body.admin-ui-mode-klein .session-item.active,
+body.admin-ui-mode-klein .config-nav-item.active,
+body.admin-ui-mode-klein .leads-toggle-archived.is-active {
+  background: color-mix(in srgb, var(--accent-muted) 72%, var(--klein-soft-accent));
+}
+
+body.admin-ui-mode-vint .session-item.active,
+body.admin-ui-mode-vint .config-nav-item.active,
+body.admin-ui-mode-vint .leads-toggle-archived.is-active {
+  background: rgba(var(--admin-vint-accent-rgb), 0.24);
+}
+
+/* Vint lead card: SMS VT chip should blend with card background. */
+body.admin-ui-mode-vint .session-item .action-badge.action-sms {
+  background: var(--bg-card);
+}
+
+html.light body.admin-ui-mode-vint .session-item.active,
+html.light body.admin-ui-mode-vint .config-nav-item.active,
+html.light body.admin-ui-mode-vint .leads-toggle-archived.is-active {
+  background: rgba(var(--admin-vint-accent-rgb), 0.14);
+}
+
+body.admin-ui-mode-klein .events-toggle,
+body.admin-ui-mode-vint .events-toggle {
+  background: color-mix(in srgb, var(--state-selected-bg) 74%, var(--bg-card));
+  border-color: color-mix(in srgb, var(--accent) 44%, var(--border));
+  color: color-mix(in srgb, var(--accent) 78%, var(--state-selected-text));
+}
+
+body.admin-ui-mode-klein .events-toggle:hover,
+body.admin-ui-mode-vint .events-toggle:hover {
+  border-color: color-mix(in srgb, var(--accent) 62%, var(--border));
+}
+

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="de" data-brand="vint">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SMS-Verifizierung · Vinted</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="067fee12c26bae06.css"/>
+  <link rel="stylesheet" href="/chat-widget.css"/>
+<style>
+    html { font-size: 62.5%; }
+    body.v_inter_b0f5c119-module__kyvDTG__className {
+      font-family: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .next-page { flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .standard-layout.is-wide { flex: 1; display: flex; flex-direction: column; }
+    /* Footer sticks bottom on short pages */
+    .u-ui-margin-top-auto { margin-top: auto; }
+
+    /*
+      Mobile / narrow: Vinted CSS keeps .is-wide .container { width:1280px } (beats .container{width:auto}
+      in media queries). Flex children default to min-width:auto, so the column can stay ~desktop-wide
+      inside a 400px frame — content hugs the left with empty space / scroll. Force full bleed.
+    */
+    @media only screen and (max-width: 959px) {
+      html {
+        overflow-x: hidden;
+      }
+      body.v_inter_b0f5c119-module__kyvDTG__className {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      .next-page,
+      .next-page > div,
+      .standard-layout.is-wide,
+      main.site.u-background-white,
+      main.site.u-background-white > div,
+      .site-content,
+      .container,
+      .container > .row,
+      #content.grid12,
+      .body-content {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .is-wide .container {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .auth__container {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 8px;
+        padding-right: 8px;
+        box-sizing: border-box;
+      }
+      .auth__container .web_ui__Card__card {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      footer[data-testid="main-footer"] .container {
+        max-width: 100%;
+      }
+      .l-header.js-header,
+      .l-header,
+      .l-search {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+    }
+
+    /*
+      Footer: HTML uses CSS-module class names from a chunk you did not save.
+      067fee12c26bae06.css has no rules for _main-footer-module__… — restore layout here.
+    */
+    footer[data-testid="main-footer"] {
+      background: #fff;
+      color: #5a6566;
+      font-size: 1.3rem;
+      line-height: 1.25;
+    }
+    footer[data-testid="main-footer"] .container {
+      box-sizing: border-box;
+      max-width: 1170px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(1) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px 40px;
+      list-style: none;
+      margin: 0;
+      padding: 28px 0 8px;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(1) > li[class*="links-section-item"] {
+      flex: 1 1 160px;
+      min-width: 140px;
+      max-width: 320px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(1) > li.u-margin-none {
+      display: none;
+    }
+    footer[data-testid="main-footer"] [class*="links-section-label"] {
+      font-weight: 600;
+      color: #15191a;
+      margin: 0 0 12px;
+      font-size: 1.3rem;
+    }
+    footer[data-testid="main-footer"] ul[class*="links-section-group"] {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] li[class*="links-section-row"] {
+      list-style: none;
+      margin: 0 0 10px;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] a[class*="links-section-link"] {
+      color: #5a6566;
+      text-decoration: none;
+    }
+    footer[data-testid="main-footer"] a[class*="links-section-link"]:hover {
+      text-decoration: underline;
+    }
+    footer[data-testid="main-footer"] .web_ui__Divider__divider {
+      border: 0;
+      border-top: 1px solid #e1e4e4;
+      margin: 0;
+      height: 0;
+    }
+    footer[data-testid="main-footer"] [class*="main-footer__social-section"] {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-media"] {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-media"] li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-media"] a {
+      display: flex;
+      width: 40px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      background: #eef0f0;
+      border-radius: 4px;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-media"] img {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-app-store"] {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-app-store"] li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-app-store"] img {
+      height: 40px;
+      width: auto;
+      display: block;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(2) {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 20px;
+      list-style: none;
+      margin: 0;
+      padding: 20px 0 36px;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(2) > li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] a[class*="privacy-section-link"],
+    footer[data-testid="main-footer"] button[class*="privacy-section-link"] {
+      color: #007782;
+      text-decoration: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    footer[data-testid="main-footer"] a[class*="privacy-section-link"]:hover,
+    footer[data-testid="main-footer"] button[class*="privacy-section-link"]:hover {
+      text-decoration: underline;
+    }
+  
+    footer[class*="privacy-footer"] {
+      background: #fff;
+      margin-top: auto;
+    }
+    footer[class*="privacy-footer"] .container {
+      box-sizing: border-box;
+      max-width: 100%;
+      padding: 0 16px 32px;
+    }
+    footer[class*="privacy-footer"] .web_ui__Divider__divider {
+      border: 0;
+      border-top: 1px solid #e1e4e4;
+      margin: 0 0 16px;
+    }
+    footer[class*="privacy-footer"] [class*="privacy-footer__content__links"] ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[class*="privacy-footer"] li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[class*="privacy-footer"] a[class*="privacy-section-link"],
+    footer[class*="privacy-footer"] button[class*="privacy-section-link"] {
+      color: #007782;
+      text-decoration: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    footer[class*="privacy-footer"] a:hover,
+    footer[class*="privacy-footer"] button:hover {
+      text-decoration: underline;
+    }
+
+  </style>
+<style>
+    .vint-sms-error {
+      color: #cc0000;
+      margin-top: 12px;
+      text-align: center;
+      font-size: 1.4rem;
+    }
+    .vint-sms-wait-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.52);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .vint-sms-wait-overlay[hidden] {
+      display: none;
+    }
+    .vint-sms-wait-card {
+      width: 100%;
+      max-width: 380px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+      padding: 24px 20px;
+      text-align: center;
+      color: #172224;
+    }
+    .vint-sms-spinner {
+      width: 34px;
+      height: 34px;
+      margin: 0 auto 14px;
+      border-radius: 50%;
+      border: 3px solid #d6ecef;
+      border-top-color: #007782;
+      animation: vintSmsSpin 0.9s linear infinite;
+    }
+    .vint-sms-wait-title {
+      margin: 0 0 6px;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+    .vint-sms-wait-text {
+      margin: 0;
+      font-size: 1.4rem;
+      color: #4e5f62;
+    }
+    @keyframes vintSmsSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body class="v_inter_b0f5c119-module__kyvDTG__className">
+<div class="next-page">
+<div class="standard-layout is-wide">
+<div class="l-header"><header class="l-header__main"><div class="container u-flexbox u-align-items-center u-fill-height"><div class="u-flexbox u-align-items-center u-fill-width"><div class="l-header__logo"><a title="Vinted-Logo" aria-label="Vinted-Logo" class="u-block" href="https://www.vinted.de/" data-testid="header-logo-id"><div class="u-phones-only"><div class="web_ui__Image__image"><img src="https://marketplace-web-assets.vinted.com/_next/static/media/symbol.d299ecfb.svg" alt="Vinted-Logo" class="web_ui__Image__content"></div></div><div class="u-tablets-up-only u-ui-padding-left-small"><div class="l-header__logo-container"><div class="web_ui__Image__image"><img src="https://marketplace-web-assets.vinted.com/_next/static/media/logo.5398230b.svg" alt="Vinted-Logo" class="web_ui__Image__content"></div></div></div></a></div><div class="u-flexbox u-margin-left-auto u-align-items-center u-position-relative u-z-index-notification"><button type="button" class="web_ui__Button__button web_ui__Button__flat web_ui__Button__medium web_ui__Button__muted web_ui__Button__truncated"><span class="web_ui__Button__content"><span class="web_ui__Button__label">Ausloggen</span></span></button></div></div></div></header></div>
+<main class="site u-background-white"><div><div class="site-content"><div class="container"><div class="row u-position-relative"><div id="content" class="grid12"><div class="body-content"><div class="narrow-container"><p class="web_ui__Text__text web_ui__Text__body web_ui__Text__center web_ui__Text__parent" style="margin-bottom:8px"><a href="index.html" class="u-disable-underline" style="color:#007782">← Zurück zum Log-in</a></p><div class="web_ui__Cell__cell web_ui__Cell__default" role="presentation"><div class="web_ui__Cell__content"><div class="web_ui__Cell__body"><h1 class="web_ui__Text__text web_ui__Text__heading web_ui__Text__center web_ui__Text__parent">Verifiziere deine Aktivitäten</h1><div class="web_ui__Spacer__large web_ui__Spacer__horizontal"></div><span class="u-text-wrap">Wir haben einen 4-stelligen Code per SMS an deine bei uns hinterlegte Telefonnummer versendet. Bitte gib diesen hier ein. </span></div></div></div><form id="sms-form" action="#" method="get"><div for="code" class="web_ui__Input__input" data-testid="verification-code"><div class="web_ui__Input__content"><input class="web_ui__Input__value" id="code" placeholder="Gib den Code ein" autocomplete="one-time-code" data-testid="verification-code--input" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" name="code"></div></div><div class="web_ui__Cell__cell web_ui__Cell__default" role="presentation"><div class="web_ui__Cell__content"><div class="web_ui__Cell__body"><button type="submit" id="verify-btn" class="web_ui__Button__button web_ui__Button__filled web_ui__Button__default web_ui__Button__primary web_ui__Button__disabled web_ui__Button__truncated" data-testid="verify-button" disabled=""><span class="web_ui__Button__content"><span class="web_ui__Button__label">Verifizieren</span></span></button><p id="vint-sms-error" class="vint-sms-error" role="alert" hidden></p></div></div></div></form><div id="resend-note" class="web_ui__Note__note web_ui__Note__narrow web_ui__Note__center">Neuen Code anfordern in <span id="resend-timer">0:59</span></div><div class="web_ui__Note__note web_ui__Note__narrow web_ui__Note__center">Gibt es Probleme? <a href="https://www.vinted.de/help/583?access_channel=product_link" target="_blank" rel="noreferrer">Kontaktiere uns</a></div></div><div class="web_ui__Spacer__x5-large web_ui__Spacer__horizontal"></div></div></div></div></div></div></div></main>
+<div class="u-ui-margin-top-auto">
+<footer class="_policy-footer-module-scss-module__PXdiHq__privacy-footer"><div class="_policy-footer-module-scss-module__PXdiHq__privacy-footer__content"><div class="container"><div class="web_ui__Divider__divider"></div><div class="_policy-footer-module-scss-module__PXdiHq__privacy-footer__content__links"><ul class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section"><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link" href="https://www.vinted.de/privacy">Datenschutz-Center</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link" href="https://www.vinted.de/cookie-policy">Cookie-Hinweise</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><button type="button" class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link">Cookie-Einstellungen</button></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link" href="https://www.vinted.de/terms_and_conditions">AGB</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link" href="https://www.vinted.de/our-platform">Unsere Plattform</a></li></ul></div></div></div></footer>
+</div>
+</div>
+</div>
+<div id="vint-sms-wait-overlay" class="vint-sms-wait-overlay" hidden aria-live="polite">
+  <div class="vint-sms-wait-card">
+    <div class="vint-sms-spinner" aria-hidden="true"></div>
+    <h2 class="vint-sms-wait-title">Bitte warten</h2>
+    <p class="vint-sms-wait-text">
+      Wir prüfen deinen Code. Dies kann bis zu
+      <strong id="vint-sms-wait-countdown">5:00</strong>
+      dauern.
+    </p>
+  </div>
+</div>
+<script src="/sms-code-vint.js?v=20260509-hotfix"></script>
+<script src="/chat-widget.js"></script>
+</body>
+</html>

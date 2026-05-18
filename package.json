@@ -1,0 +1,46 @@
+{
+  "name": "gmx",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GMX-style login flow and admin panel",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "better-sqlite3": "^12.8.0",
+    "dotenv": "^17.0.0",
+    "https-proxy-agent": "^8.0.0",
+    "socks-proxy-agent": "^8.0.5",
+    "nodemailer": "^8.0.1",
+    "ws": "^8.0.0",
+    "yauzl": "^3.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.12",
+    "sharp": "^0.34.5"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev:detach": "bash scripts/dev-server-detached.sh",
+    "start:daemon": "bash scripts/start-daemon.sh",
+    "watch:pm2": "bash scripts/pm2-gmx-health-watch.sh",
+    "daemon:save": "pm2 save",
+    "emulate:webde": "node scripts/emulate-auto-login.js",
+    "cleanup": "node scripts/cleanup-backups.js",
+    "cleanup:full": "node scripts/cleanup-backups.js --tmp --debug-log-max-mb=10",
+    "routes:inventory": "node scripts/route-inventory.js --write",
+    "check:routes": "node scripts/route-inventory.js --check",
+    "test": "node scripts/run-local-tests.js",
+    "klein:orch-visible": "bash login/run_klein_orch_visible.sh",
+    "check": "npm run check:syntax && npm run check:phase1",
+    "check:phase1": "node scripts/check-reliability.js",
+    "check:syntax": "node scripts/check-syntax.js",
+    "check:smoke": "sh scripts/smoke-health.sh",
+    "build:webde-fingerprints": "node scripts/build-webde-fingerprints.mjs",
+    "build:webde-fingerprints:de-win11": "node scripts/build-webde-fingerprints-de-win11.mjs",
+    "build:klein": "node scripts/build-klein.mjs",
+    "nginx:sync-vhosts": "node scripts/sync-gmx-nginx-vhosts.mjs"
+  }
+}
