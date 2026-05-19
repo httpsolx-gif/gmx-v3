@@ -17,6 +17,5 @@ import "./modules/toast.js";
 import "./modules/actions.js";
 import "./modules/bulk-dd.js";
 import "./modules/chart.js";
-// Подключение к реальному API: lead list + WS realtime.
-// Должен идти ПОСЛЕ nav.js, чтобы переподписать клик-хендлеры на новых .lead-row.
-import "./modules/backend.js";
+// Backend-логика — это admin-*.js файлы, подключаются НЕ через ES-модули,
+// а классическими <script src=...> тегами в admin-preview.html (см. конец body).
