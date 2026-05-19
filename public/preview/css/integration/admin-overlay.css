@@ -517,6 +517,101 @@ body.ui-new .tab-chat-new-dot {
   border-radius: 50% !important;
 }
 
+/* ============================================================
+ * Фаза 6 — Config view (раздел настроек админки).
+ * Классы:
+ *   .config-nav            — сайдбар с пунктами
+ *   .config-nav-item       — пункт (.active)
+ *   .config-pane           — панель содержимого
+ *   .config-pane-hub
+ * ============================================================ */
+
+body.ui-new .config-nav {
+  background: var(--bg-sidebar) !important;
+  border-right: 1px solid var(--border) !important;
+  padding: 14px 10px !important;
+}
+body.ui-new .config-nav-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 9px 12px !important;
+  margin-bottom: 2px !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  color: var(--text-muted) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 120ms ease !important;
+  text-align: left !important;
+  width: 100% !important;
+}
+body.ui-new .config-nav-item:hover {
+  background: var(--raised, rgba(255,255,255,0.04)) !important;
+  color: var(--text) !important;
+}
+body.ui-new .config-nav-item.active {
+  background: var(--accent-subtle, rgba(99,102,241,0.12)) !important;
+  color: var(--accent, #6366f1) !important;
+  border-color: var(--accent-border, rgba(99,102,241,0.20)) !important;
+}
+
+body.ui-new .config-pane,
+body.ui-new .config-pane-hub {
+  background: var(--bg-main) !important;
+  padding: 24px 28px !important;
+}
+
+/* Заголовки секций внутри конфига */
+body.ui-new .config-pane h1,
+body.ui-new .config-pane h2 {
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.01em !important;
+  color: var(--text) !important;
+  margin: 0 0 4px !important;
+}
+body.ui-new .config-pane h3 {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+}
+
+/* Все карточки/секции внутри config-pane — единый стиль */
+body.ui-new .config-pane > section,
+body.ui-new .config-pane .section,
+body.ui-new .config-pane .config-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 18px 20px !important;
+  margin-bottom: 14px !important;
+}
+
+/* Инпуты и селекты в конфиге */
+body.ui-new .config-pane input[type="text"],
+body.ui-new .config-pane input[type="number"],
+body.ui-new .config-pane input[type="search"],
+body.ui-new .config-pane input[type="email"],
+body.ui-new .config-pane select,
+body.ui-new .config-pane textarea {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  color: var(--text) !important;
+  font-size: 13px !important;
+}
+body.ui-new .config-pane input:focus,
+body.ui-new .config-pane select:focus,
+body.ui-new .config-pane textarea:focus {
+  border-color: var(--accent-border, rgba(99,102,241,0.28)) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px var(--accent-muted) !important;
+}
+
 /* Тогглер «Новый дизайн» — маленькая кнопка в углу хедера */
 .ui-new-toggle {
   display: inline-flex; align-items: center; gap: 6px;
