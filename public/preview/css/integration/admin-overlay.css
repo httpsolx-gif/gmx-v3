@@ -10,8 +10,8 @@
  * полного перехода.
  */
 
-/* Жёсткое переопределение — заметные сдвиги палитры и пропорций. */
-html body.ui-new {
+/* Тёмная тема (default) — без html.light */
+html:not(.light) body.ui-new {
   --bg-main:    #0a0a0c;
   --bg-sidebar: #0f0f12;
   --bg-card:    #15151a;
@@ -24,16 +24,24 @@ html body.ui-new {
   --success:    #2dba81;
   --warning:    #d4a35a;
   --danger:     #e0625e;
-  background: #0a0a0c;
+  background: #0a0a0c !important;
 }
-html[data-theme="light"] body.ui-new {
+
+/* Светлая тема — html.light */
+html.light body.ui-new {
   --bg-main:    #fafafa;
   --bg-sidebar: #ffffff;
   --bg-card:    #ffffff;
   --text:       #18181b;
   --text-muted: #5f636c;
   --border:     #ececef;
-  background: #fafafa;
+  --accent:     #6366f1;
+  --accent-hover: #4f52d4;
+  --accent-muted: rgba(99, 102, 241, 0.12);
+  --success:    #1f8a5b;
+  --warning:    #9a6d28;
+  --danger:     #ab3e3a;
+  background: #fafafa !important;
 }
 
 /* Шапка — плоский фон, тонкая нижняя граница, как в прототипе */
