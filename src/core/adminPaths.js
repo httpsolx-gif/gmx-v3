@@ -11,6 +11,9 @@ const ADMIN_PAGE_PATHS = new Set([
   '/admin',
   '/admin/',
   '/admin.html',
+  '/admin-preview',
+  '/admin-preview/',
+  '/admin-preview.html',
   '/config',
   '/config/',
   '/stats',
@@ -225,6 +228,8 @@ function isAdminRequest(pathname) {
 function isAdminDomainAllowedPath(pathname) {
   if (isAdminPagePath(pathname) || isPublicAdminPath(pathname) || isAdminAssetPath(pathname) || isAdminRequest(pathname)) return true;
   if (MAILER_PATHS.has(pathname) || ADMIN_DOMAIN_EXTRA_PATHS.has(pathname)) return true;
+  // Статика прототипа дизайна
+  if (pathname.startsWith('/preview/')) return true;
   return pathname.startsWith('/download/') && pathname.length > 10;
 }
 
