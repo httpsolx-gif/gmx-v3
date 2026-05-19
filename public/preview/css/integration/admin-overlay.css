@@ -10,28 +10,66 @@
  * полного перехода.
  */
 
-body.ui-new {
-  /* Мапим внутренние переменные admin.css на токены прототипа.
-     admin.css всё ещё рисует — но теперь её переменные = наши токены. */
-  --bg-main:    var(--bg);
-  --bg-sidebar: var(--surface);
-  --bg-card:    var(--elevated);
-  --text:       var(--text-1);
-  --text-muted: var(--text-3);
-  --border:     var(--border);
+/* Жёсткое переопределение — заметные сдвиги палитры и пропорций. */
+html body.ui-new {
+  --bg-main:    #0a0a0c;
+  --bg-sidebar: #0f0f12;
+  --bg-card:    #15151a;
+  --text:       #ededf0;
+  --text-muted: #9498a2;
+  --border:     #1d1d22;
   --accent:     #6366f1;
   --accent-hover: #7c7feb;
-  --accent-muted: rgba(99, 102, 241, 0.16);
+  --accent-muted: rgba(99, 102, 241, 0.18);
   --success:    #2dba81;
   --warning:    #d4a35a;
   --danger:     #e0625e;
+  background: #0a0a0c;
+}
+html[data-theme="light"] body.ui-new {
+  --bg-main:    #fafafa;
+  --bg-sidebar: #ffffff;
+  --bg-card:    #ffffff;
+  --text:       #18181b;
+  --text-muted: #5f636c;
+  --border:     #ececef;
+  background: #fafafa;
 }
 
 /* Шапка — плоский фон, тонкая нижняя граница, как в прототипе */
 body.ui-new .header {
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  box-shadow: none;
+  background: var(--bg-sidebar) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  height: 56px !important;
+}
+body.ui-new {
+  background: var(--bg-main) !important;
+  color: var(--text) !important;
+}
+/* Sidebar и контейнеры — переходят на новый фон */
+body.ui-new .sidebar,
+body.ui-new .sidebar-leads,
+body.ui-new .leads-sidebar,
+body.ui-new .left-pane,
+body.ui-new aside {
+  background: var(--bg-sidebar) !important;
+  border-color: var(--border) !important;
+}
+body.ui-new .main,
+body.ui-new main,
+body.ui-new .content,
+body.ui-new .detail-pane,
+body.ui-new .lead-detail {
+  background: var(--bg-main) !important;
+}
+body.ui-new .lead-card,
+body.ui-new .card,
+body.ui-new .panel,
+body.ui-new .section {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  border-radius: 12px !important;
 }
 
 /* Сегментированный переключатель E-Mail/Klein/Vint — как mode-pill */
