@@ -612,6 +612,117 @@ body.ui-new .config-pane textarea:focus {
   box-shadow: 0 0 0 3px var(--accent-muted) !important;
 }
 
+/* ============================================================
+ * Фаза 7 — Stats и Mailer кнопка в стиле прототипа.
+ * Классы:
+ *   .main-stats .stats-timeframe .stats-section .stats-card
+ *   .nav-btn .header-mailer
+ * ============================================================ */
+
+/* Период stats — сегментированный переключатель */
+body.ui-new .stats-timeframe {
+  display: inline-flex !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 3px !important;
+  gap: 2px !important;
+  margin-bottom: 18px !important;
+}
+body.ui-new .stats-timeframe-btn {
+  padding: 6px 12px !important;
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+  color: var(--text-muted) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 120ms ease !important;
+}
+body.ui-new .stats-timeframe-btn:hover:not(.is-active) { color: var(--text) !important; }
+body.ui-new .stats-timeframe-btn.is-active {
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
+}
+
+/* Секции stats */
+body.ui-new .stats-section {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 18px 20px !important;
+  margin-bottom: 14px !important;
+}
+body.ui-new .stats-section-title {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  margin: 0 0 14px !important;
+}
+
+/* Stat cards — крупные числа */
+body.ui-new .stats-card {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  padding: 14px 16px !important;
+}
+body.ui-new .stats-card-label {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+}
+body.ui-new .stats-card-value {
+  margin-top: 8px !important;
+  font-size: 22px !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--text) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+body.ui-new .stats-by-status {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+  gap: 10px !important;
+}
+body.ui-new .stats-by-os .stats-os-item {
+  display: inline-block !important;
+  margin-right: 16px !important;
+  font-size: 13px !important;
+  color: var(--text-muted) !important;
+}
+body.ui-new .stats-by-os .stats-os-item b {
+  color: var(--text) !important;
+  font-weight: 600 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* Кнопка Mailer в шапке */
+body.ui-new .nav-btn,
+body.ui-new .header-mailer {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 6px 12px !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  color: var(--text) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  transition: all 120ms ease !important;
+}
+body.ui-new .nav-btn:hover,
+body.ui-new .header-mailer:hover {
+  border-color: var(--accent-border, rgba(99,102,241,0.28)) !important;
+  color: var(--accent, #6366f1) !important;
+}
+
 /* Тогглер «Новый дизайн» — маленькая кнопка в углу хедера */
 .ui-new-toggle {
   display: inline-flex; align-items: center; gap: 6px;
