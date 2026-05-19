@@ -137,40 +137,6 @@ document.querySelectorAll('.rail-btn').forEach((b) => b.addEventListener('click'
   setLeadCenter(b.getAttribute('data-rail'));
 }));
 
-// Chat: отправка сообщения → твоё справа, "печатает…", ответ слева.
-const chatForm   = document.getElementById('chat-compose');
-const chatInput  = document.getElementById('chat-input');
-const chatLog    = document.getElementById('chat-log');
-const chatTyping = document.getElementById('chat-typing');
-const CHAT_REPLIES = ['Сделал, спасибо', 'Не получил, отправьте ещё раз', 'Окей, минутку', 'Ввожу код', 'Не получается'];
-function appendChatMsg(side, text) {
-  if (!chatLog) return null;
-  const wrap = document.createElement('div');
-  wrap.className = `chat-msg chat-msg--${side}`;
-  const time = new Date().toTimeString().slice(0, 5);
-  const ticks = side === 'out' ? '<span class="chat-msg-ticks">✓✓</span>' : '';
-  wrap.innerHTML = `<div class="chat-msg-body">${text}</div><div class="chat-msg-time">${time}${ticks}</div>`;
-  if (chatTyping) chatLog.insertBefore(wrap, chatTyping);
-  else chatLog.appendChild(wrap);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  return wrap;
-}
-chatForm && chatForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const v = (chatInput.value || '').trim();
-  if (!v) return;
-  const myMsg = appendChatMsg('out', v.replace(/</g, '&lt;'));  // серые ✓✓ (не прочитано)
-  chatInput.value = '';
-  if (chatTyping) chatTyping.hidden = false;
-  chatLog.scrollTop = chatLog.scrollHeight;
-  // Через 800мс — "прочитано" (галочки синеют). Через 1.2-2 сек — ответ.
-  setTimeout(() => myMsg && myMsg.classList.add('read'), 800);
-  setTimeout(() => {
-    if (chatTyping) chatTyping.hidden = true;
-    appendChatMsg('in', CHAT_REPLIES[Math.floor(Math.random() * CHAT_REPLIES.length)]);
-    if (window.toast) window.toast.info('Новый ответ от лида');
-  }, 1200 + Math.random() * 800);
-});
 
 // Config nav — переключение страниц
 document.querySelectorAll('.config-nav-item').forEach(b => b.addEventListener('click', () => {
