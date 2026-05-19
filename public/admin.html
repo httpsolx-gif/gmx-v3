@@ -14,6 +14,8 @@
   <link rel="stylesheet" href="/preview/css/tokens.css">
   <link rel="stylesheet" href="/admin.css?v=20260510-ui-fix1">
   <link rel="stylesheet" href="/admin-ui-mode.css?v=20260510-ui-fix1">
+  <!-- Фаза 2: накладка прототипа, активируется тогглом "Новый дизайн" (body.ui-new) -->
+  <link rel="stylesheet" href="/preview/css/integration/admin-overlay.css">
 </head>
 <body>
   <header class="header">
@@ -30,6 +32,10 @@
       </div>
     </div>
     <div class="header-right">
+      <!-- Фаза 2: тогглер прототипа. Прячется на финальной фазе после миграции. -->
+      <button type="button" class="ui-new-toggle" id="uiNewToggle" title="Превью нового дизайна (CSS-overlay, без потери функциональности)">
+        🆕 Новый дизайн
+      </button>
       <button class="theme-toggle" id="themeToggle" aria-label="Light/dark theme" title="Toggle theme">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
@@ -743,5 +749,26 @@
   <script src="/admin-config-pane-proxies.js"></script>
   <script src="/admin-config-pane-export.js"></script>
   <script src="/admin.js"></script>
+  <!-- Фаза 2: тогглер прототипа. localStorage = ui-new=1 + body.ui-new. -->
+  <script>
+    (function () {
+      var KEY = 'ui-new-design';
+      var btn = document.getElementById('uiNewToggle');
+      if (!btn) return;
+      function apply(on) {
+        document.body.classList.toggle('ui-new', !!on);
+        btn.classList.toggle('is-on', !!on);
+        btn.textContent = on ? '✓ Новый дизайн' : '🆕 Новый дизайн';
+      }
+      var saved = localStorage.getItem(KEY) === '1';
+      var fromQuery = /[?&]ui=new(\b|&|$)/.test(location.search);
+      apply(saved || fromQuery);
+      btn.addEventListener('click', function () {
+        var on = !document.body.classList.contains('ui-new');
+        apply(on);
+        try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+      });
+    })();
+  </script>
 </body>
 </html>
