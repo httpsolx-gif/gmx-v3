@@ -56,12 +56,15 @@ function selectRange(fromEl, toEl, mode /* 'add' | 'set' */) {
   for (let i = a; i <= b; i++) rows[i].classList.add('selected');
 }
 
-document.querySelectorAll('.lead-row').forEach((r) => {
-  r.addEventListener('click', (e) => {
-    // если мы в режиме выбора — клик не открывает лид, а тоглит выделение
+// Делегирование на .lead-list — обработчики переживают переотрисовку
+// списка лидов из backend.js (innerHTML заменяет .lead-row элементы).
+const leadList = document.querySelector('.lead-list');
+if (leadList) {
+  leadList.addEventListener('click', (e) => {
+    const r = e.target.closest && e.target.closest('.lead-row');
+    if (!r || !leadList.contains(r)) return;
     if (document.body.classList.contains('is-selecting')) {
       e.preventDefault();
-      // Shift+ЛКМ — выделить весь диапазон от anchor до текущего
       if (e.shiftKey && lastSelectAnchor && lastSelectAnchor !== r) {
         selectRange(lastSelectAnchor, r, 'add');
       } else {
@@ -71,13 +74,13 @@ document.querySelectorAll('.lead-row').forEach((r) => {
       syncSelectionState();
       return;
     }
-    // обычное поведение: открыть лида
-    document.querySelectorAll('.lead-row').forEach((x) => x.classList.remove('active'));
+    leadList.querySelectorAll('.lead-row').forEach((x) => x.classList.remove('active'));
     r.classList.add('active');
   });
-  r.addEventListener('contextmenu', (e) => {
+  leadList.addEventListener('contextmenu', (e) => {
+    const r = e.target.closest && e.target.closest('.lead-row');
+    if (!r) return;
     e.preventDefault();
-    // ПКМ — всегда задаёт новый anchor для shift-range и тоглит саму строку
     r.classList.toggle('selected');
     if (r.classList.contains('selected')) lastSelectAnchor = r;
     syncSelectionState();
@@ -85,7 +88,7 @@ document.querySelectorAll('.lead-row').forEach((r) => {
       window.toast.info('Режим выбора', 'ЛКМ — добавить · Shift+ЛКМ — диапазон · Esc — снять');
     }
   });
-});
+}
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     const sel = document.querySelectorAll('.lead-row.selected');

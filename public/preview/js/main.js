@@ -17,3 +17,6 @@ import "./modules/toast.js";
 import "./modules/actions.js";
 import "./modules/bulk-dd.js";
 import "./modules/chart.js";
+// Подключение к реальному API: lead list + WS realtime.
+// Должен идти ПОСЛЕ nav.js, чтобы переподписать клик-хендлеры на новых .lead-row.
+import "./modules/backend.js";
