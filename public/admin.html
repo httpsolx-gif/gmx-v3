@@ -8,6 +8,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Фаза 1 интеграции прототипа: токены загружаются ДО admin.css; переменные
+       с одинаковыми именами админ потом переопределит, ничего не ломая. Новые
+       переменные (radius/shadow/etc) станут доступны Фазам 2+. -->
+  <link rel="stylesheet" href="/preview/css/tokens.css">
   <link rel="stylesheet" href="/admin.css?v=20260510-ui-fix1">
   <link rel="stylesheet" href="/admin-ui-mode.css?v=20260510-ui-fix1">
 </head>
