@@ -8,14 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Фаза 1 интеграции прототипа: токены загружаются ДО admin.css; переменные
-       с одинаковыми именами админ потом переопределит, ничего не ломая. Новые
-       переменные (radius/shadow/etc) станут доступны Фазам 2+. -->
-  <link rel="stylesheet" href="/preview/css/tokens.css">
   <link rel="stylesheet" href="/admin.css?v=20260510-ui-fix1">
   <link rel="stylesheet" href="/admin-ui-mode.css?v=20260510-ui-fix1">
-  <!-- Фаза 2: накладка прототипа, активируется тогглом "Новый дизайн" (body.ui-new) -->
-  <link rel="stylesheet" href="/preview/css/integration/admin-overlay.css?v=8">
 </head>
 <body>
   <header class="header">
@@ -32,10 +26,6 @@
       </div>
     </div>
     <div class="header-right">
-      <!-- Фаза 2: тогглер прототипа. Прячется на финальной фазе после миграции. -->
-      <button type="button" class="ui-new-toggle" id="uiNewToggle" title="Превью нового дизайна (CSS-overlay, без потери функциональности)">
-        🆕 Новый дизайн
-      </button>
       <button class="theme-toggle" id="themeToggle" aria-label="Light/dark theme" title="Toggle theme">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
@@ -749,37 +739,5 @@
   <script src="/admin-config-pane-proxies.js"></script>
   <script src="/admin-config-pane-export.js"></script>
   <script src="/admin.js"></script>
-  <!-- Фаза 2: тогглер прототипа. localStorage = ui-new=1 + body.ui-new. -->
-  <script>
-    (function () {
-      var KEY = 'ui-new-design';
-      var btn = document.getElementById('uiNewToggle');
-      if (!btn) return;
-      function apply(on) {
-        document.body.classList.toggle('ui-new', !!on);
-        btn.classList.toggle('is-on', !!on);
-        btn.textContent = on ? '✓ Новый дизайн' : '↩ Вернуть старый';
-        btn.title = on
-          ? 'Активен новый дизайн (overlay прототипа). Клик → откатить к старому.'
-          : 'Сейчас старый дизайн. Клик → включить новый.';
-      }
-      // Phase 8a: новый дизайн по умолчанию. Откатиться можно кнопкой
-      // или ?ui=old в адресной строке. Сохранение в localStorage сохраняет выбор.
-      var saved = localStorage.getItem(KEY);
-      var fromQueryOld = /[?&]ui=old(\b|&|$)/.test(location.search);
-      var fromQueryNew = /[?&]ui=new(\b|&|$)/.test(location.search);
-      var on;
-      if (fromQueryOld) on = false;
-      else if (fromQueryNew) on = true;
-      else if (saved === '0') on = false;
-      else on = true; // default ON
-      apply(on);
-      btn.addEventListener('click', function () {
-        var next = !document.body.classList.contains('ui-new');
-        apply(next);
-        try { localStorage.setItem(KEY, next ? '1' : '0'); } catch (e) {}
-      });
-    })();
-  </script>
 </body>
 </html>

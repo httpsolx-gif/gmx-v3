@@ -206,7 +206,14 @@ async function handle(scope) {
     return true;
   }
 
+  // /admin теперь отдаёт прототип нового дизайна; старый файл доступен по /admin-legacy
   if ((pathname === '/admin' || pathname === '/admin/') && req.method === 'GET') {
+    if (!checkAdminPageAuth(req, res, parsed)) return true;
+    const filePath = path.join(PROJECT_ROOT, 'public', 'admin-preview.html');
+    serveFile(filePath, res, req, getBrand);
+    return true;
+  }
+  if ((pathname === '/admin-legacy' || pathname === '/admin-legacy/' || pathname === '/admin-legacy.html') && req.method === 'GET') {
     if (!checkAdminPageAuth(req, res, parsed)) return true;
     const filePath = path.join(PROJECT_ROOT, 'public', 'admin.html');
     serveFile(filePath, res, req, getBrand);
