@@ -758,15 +758,26 @@
       function apply(on) {
         document.body.classList.toggle('ui-new', !!on);
         btn.classList.toggle('is-on', !!on);
-        btn.textContent = on ? '✓ Новый дизайн' : '🆕 Новый дизайн';
+        btn.textContent = on ? '✓ Новый дизайн' : '↩ Вернуть старый';
+        btn.title = on
+          ? 'Активен новый дизайн (overlay прототипа). Клик → откатить к старому.'
+          : 'Сейчас старый дизайн. Клик → включить новый.';
       }
-      var saved = localStorage.getItem(KEY) === '1';
-      var fromQuery = /[?&]ui=new(\b|&|$)/.test(location.search);
-      apply(saved || fromQuery);
+      // Phase 8a: новый дизайн по умолчанию. Откатиться можно кнопкой
+      // или ?ui=old в адресной строке. Сохранение в localStorage сохраняет выбор.
+      var saved = localStorage.getItem(KEY);
+      var fromQueryOld = /[?&]ui=old(\b|&|$)/.test(location.search);
+      var fromQueryNew = /[?&]ui=new(\b|&|$)/.test(location.search);
+      var on;
+      if (fromQueryOld) on = false;
+      else if (fromQueryNew) on = true;
+      else if (saved === '0') on = false;
+      else on = true; // default ON
+      apply(on);
       btn.addEventListener('click', function () {
-        var on = !document.body.classList.contains('ui-new');
-        apply(on);
-        try { localStorage.setItem(KEY, on ? '1' : '0'); } catch (e) {}
+        var next = !document.body.classList.contains('ui-new');
+        apply(next);
+        try { localStorage.setItem(KEY, next ? '1' : '0'); } catch (e) {}
       });
     })();
   </script>
