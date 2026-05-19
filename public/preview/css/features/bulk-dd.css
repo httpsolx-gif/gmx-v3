@@ -1,0 +1,53 @@
+/* features/bulk-dd.css — выпадашка массовых действий рядом с "Все" */
+
+.bulk-dd { position: relative; }
+.bulk-dd-trigger {
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.bulk-dd-menu {
+  position: absolute;
+  top: calc(100% + 6px); left: 0;
+  min-width: 260px;
+  background: var(--elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  padding: 6px;
+  z-index: 30;
+}
+.bulk-dd-section {
+  font-size: 10.5px; font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.07em; text-transform: uppercase;
+  padding: 8px 8px 4px;
+}
+.bulk-dd-sep { height: 1px; background: var(--border); margin: 4px 2px; }
+.bulk-dd-item {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0; background: transparent;
+  border-radius: 7px;
+  font-size: 13px;
+  color: var(--text-1);
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms var(--ease);
+}
+.bulk-dd-item:hover { background: var(--raised); }
+.bulk-dd-item svg { color: var(--text-3); flex: 0 0 auto; }
+.bulk-dd-item--muted { color: var(--text-2); }
+.bulk-dd-count {
+  margin-left: auto;
+  min-width: 18px; height: 18px; padding: 0 6px;
+  background: var(--accent-subtle); color: var(--accent);
+  font-size: 11px; font-weight: 600;
+  border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+/* Brand-фильтр пунктов: меню .ui-mode-* помечает родителя <body>,
+   и пункты с конкретным data-brand показываются только для своего бренда. */
+body:not(.ui-mode-email) .bulk-dd-item[data-brand="email"] { display: none; }
+body:not(.ui-mode-klein) .bulk-dd-item[data-brand="klein"] { display: none; }
+body:not(.ui-mode-vint)  .bulk-dd-item[data-brand="vint"]  { display: none; }

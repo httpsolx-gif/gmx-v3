@@ -1,0 +1,62 @@
+/* features/home.css — режимы по брендам (mode-row/mode-seg) */
+
+/* --- Home: режимы по брендам ----------------------------------------- */
+.mode-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.mode-row + .mode-row { margin-top: 10px; }
+.mode-row-brand {
+  display: flex; align-items: center; gap: 12px;
+  flex: 1; min-width: 0;
+}
+.mode-row-brand .brand-dot { flex: 0 0 auto; }
+.mode-row-name {
+  font-size: 14px; font-weight: 600; color: var(--text-1);
+}
+.mode-row-sub {
+  font-size: 12px; color: var(--text-3); margin-top: 2px;
+}
+.mode-row-toggle {
+  display: inline-flex;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+.mode-seg {
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 120ms var(--ease);
+}
+.mode-seg:hover:not(.active) { color: var(--text-1); }
+.mode-seg.active {
+  background: var(--raised);
+  color: var(--text-1);
+}
+@media (max-width: 720px) {
+  .mode-row { flex-direction: column; align-items: stretch; }
+  .mode-row-toggle { align-self: flex-start; flex-wrap: wrap; }
+}
+
+/* Шапки карточек: не ломаемся когда узко */
+.email-card-head {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+.email-card-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+

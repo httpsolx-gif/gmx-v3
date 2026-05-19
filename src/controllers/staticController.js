@@ -186,6 +186,18 @@ async function handle(scope) {
     return true;
   }
 
+  // Статика прототипа дизайна: public/preview/**.{css,js,svg,png,html}
+  if (pathname.startsWith('/preview/') && (req.method === 'GET' || req.method === 'HEAD')) {
+    const rel = pathname.replace(/^\/preview\//, '');
+    if (!/^[A-Za-z0-9._\-\/]+$/.test(rel) || rel.includes('..')) {
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.end('bad path');
+      return true;
+    }
+    serveFile(path.join(PROJECT_ROOT, 'public', 'preview', rel), res, req, getBrand);
+    return true;
+  }
+
   if ((pathname === '/config' || pathname === '/config/' || pathname === '/stats' || pathname === '/stats/') && req.method === 'GET') {
     if (!checkAdminPageAuth(req, res, parsed)) return true;
     if (safeEnd(res)) return true;

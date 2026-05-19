@@ -1,0 +1,5 @@
+/* layout/shell.css — корневая сетка приложения */
+
+/* ===== SHELL ===== */
+.app { display: grid; grid-template-rows: var(--topbar-h) 1fr; height: 100vh; }
+

@@ -1,0 +1,132 @@
+/* features/email-editor.css — таб-выбор бренда, grid редактор/превью, viewport */
+
+
+/* === E-Mail config: brand tabs + editor + preview === */
+.email-brand-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  /* без width: fit-content — растягиваемся на всю колонку editor-main,
+     чтобы по ширине совпадать с карточками Профиль/Письмо/SMTP под ним */
+}
+.email-brand-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 140ms var(--ease);
+}
+.email-brand-tab:hover:not(.active) { color: var(--text-1); }
+.email-brand-tab.active {
+  background: var(--raised);
+  color: var(--text-1);
+  border-color: var(--border-strong);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset;
+}
+
+.email-editor {
+  display: grid;
+  --email-preview-w: 480px;
+  grid-template-columns:
+    minmax(320px, 1fr)
+    6px
+    minmax(320px, min(var(--email-preview-w), 70%));
+  grid-template-rows: auto 1fr;
+  gap: 0;
+  column-gap: 10px;
+  align-items: start;
+}
+/* brand-tabs — первая строка, только левая колонка */
+.email-editor > .email-brand-tabs { grid-column: 1; grid-row: 1; }
+/* левая часть — вторая строка, та же колонка */
+.email-editor > .email-editor-main { grid-column: 1; grid-row: 2; }
+/* ресайз-хэндл и превью растянуты на обе строки → выравниваются по верху с tabs */
+.email-editor > .email-editor-resizer { grid-column: 2; grid-row: 1 / span 2; }
+.email-editor > .email-preview      { grid-column: 3; grid-row: 1 / span 2; }
+@media (min-width: 1500px) {
+  .email-editor { --email-preview-w: 560px; }
+}
+@media (max-width: 1100px) {
+  /* На узких экранах превью уходит вниз отдельной строкой */
+  .email-editor {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .email-editor-resizer { display: none; }
+}
+
+/* Хэндл для ресайза по горизонтали */
+.email-editor-resizer {
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+  position: relative;
+  align-self: stretch;
+  border-radius: 4px;
+  transition: background 0.12s;
+}
+.email-editor-resizer::before {
+  content: "";
+  position: absolute;
+  inset: 16px 2px;
+  background: var(--border-1);
+  border-radius: 2px;
+}
+.email-editor-resizer:hover,
+.email-editor-resizer.is-dragging { background: rgba(99,102,241,0.08); }
+.email-editor-resizer:hover::before,
+.email-editor-resizer.is-dragging::before { background: var(--accent, #6366f1); }
+body.is-col-resizing { cursor: col-resize; user-select: none; }
+
+/* Превью можно растянуть вниз. Верхнюю позицию задаёт grid: превью
+   занимает обе строки справа, поэтому top автоматически совпадает с brand-tabs. */
+.email-preview { min-width: 0; }
+.email-preview .email-preview-card {
+  position: relative;
+  overflow: auto;
+  height: var(--email-preview-h, auto);
+  min-height: 360px;
+  max-height: 96vh;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-bottom: 18px; /* место под нижний ресайз-хэндл */
+}
+/* Нижний ресайз-хэндл (south) — симметричен боковому */
+.email-preview-resizer-y {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 4px;
+  height: 8px;
+  cursor: row-resize;
+  border-radius: 4px;
+  background: transparent;
+  transition: background 0.12s;
+  z-index: 2;
+}
+.email-preview-resizer-y::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: 3px;
+  height: 2px;
+  background: var(--border-1);
+  border-radius: 2px;
+}
+.email-preview-resizer-y:hover,
+.email-preview-resizer-y.is-dragging { background: rgba(99,102,241,0.08); }
+.email-preview-resizer-y:hover::before,
+.email-preview-resizer-y.is-dragging::before { background: var(--accent, #6366f1); }
+body.is-row-resizing { cursor: row-resize; user-select: none; }
+
