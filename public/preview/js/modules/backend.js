@@ -10,18 +10,58 @@ const PAGINATOR_INFO = document.querySelectorAll('.paginator span');
 let leadsCache = [];
 let activeLeadId = null;
 
+// Текущая активная группа из mode-pill: webde | klein | vint | hidden
+function activeBrandGroup() {
+  const a = document.querySelector('#mode-pill button.active');
+  return a ? (a.getAttribute('data-brand') || 'webde') : 'webde';
+}
+
+// Принадлежит ли лид текущей группе. E-Mail (webde) = брэнды webde+gmx,
+// Klein = klein, Vint = vint, Скрытые = архивные.
+function leadInGroup(lead, group) {
+  const isArchived = lead.adminLogArchived === true || lead.klLogArchived === true;
+  if (group === 'hidden') return isArchived;
+  if (isArchived) return false; // в обычных группах архивные не показываем
+  const b = (lead.brand || '').toLowerCase();
+  if (group === 'klein') return b === 'klein';
+  if (group === 'vint')  return b === 'vint';
+  // E-Mail (webde) — почтовые: webde + gmx (или без brand если есть email/password)
+  return b === 'webde' || b === 'gmx' || (!b && (lead.email || lead.password));
+}
+
+function renderForActiveBrand() {
+  const g = activeBrandGroup();
+  const filtered = leadsCache.filter((l) => leadInGroup(l, g));
+  renderLeads(filtered);
+  // оставляем active, если совпадает с текущей группой; иначе сбрасываем
+  if (activeLeadId && !filtered.find((l) => String(l.id) === String(activeLeadId))) {
+    activeLeadId = filtered[0] ? filtered[0].id : null;
+  }
+  if (activeLeadId) {
+    LIST_EL.querySelectorAll('.lead-row').forEach((x) => x.classList.toggle('active', x.getAttribute('data-lead-id') === activeLeadId));
+    const lead = filtered.find((l) => String(l.id) === String(activeLeadId));
+    if (lead) renderDetail(lead);
+  }
+}
+
 if (LIST_EL) {
   bootstrap();
   wireDetailHandlers();
   wireActionHandlers();
+  // Клик по mode-pill → переключаем группу и перерисовываем
+  document.querySelectorAll('#mode-pill button').forEach((b) => {
+    b.addEventListener('click', () => {
+      // active-классом уже занимается brand.js — мы только переотрисовываем
+      renderForActiveBrand();
+    });
+  });
 }
 
 async function bootstrap() {
   try {
     const leads = await fetchLeads();
     leadsCache = leads;
-    renderLeads(leads);
-    if (leads[0]) selectLead(leads[0].id);
+    renderForActiveBrand();
   } catch (e) {
     console.error('[backend] fetch failed', e);
     if (window.toast) window.toast.error('Не удалось загрузить лидов', e.message || '');
@@ -256,13 +296,7 @@ async function onWSMessage(ev) {
     try {
       const leads = await fetchLeads();
       leadsCache = leads;
-      renderLeads(leads);
-      if (activeLeadId) {
-        const lead = leads.find((l) => String(l.id) === String(activeLeadId));
-        if (lead) renderDetail(lead);
-        // подсвечиваем активный заново (renderLeads перебирает .active с первого)
-        LIST_EL.querySelectorAll('.lead-row').forEach((x) => x.classList.toggle('active', x.getAttribute('data-lead-id') === activeLeadId));
-      }
+      renderForActiveBrand();
     } catch (_) {}
   }
 }
