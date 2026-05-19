@@ -418,6 +418,105 @@ body.ui-new .detail-worked-banner {
   font-weight: 600 !important;
 }
 
+/* ============================================================
+ * Фаза 5 — правая колонка: чат, log-таб, события под прототип.
+ * Классы:
+ *   .chat-panel              — контейнер чата справа
+ *   .chat-panel-header       — шапка
+ *   .admin-chat-messages     — лента сообщений
+ *   .admin-chat-input-row    — нижний композер
+ *   .detail-chat-tabs        — табы Log / Chat
+ *   .detail-chat-tab.is-active
+ * ============================================================ */
+
+body.ui-new .chat-panel {
+  background: var(--bg-sidebar) !important;
+  border-left: 1px solid var(--border) !important;
+}
+body.ui-new .chat-panel-header {
+  padding: 12px 14px !important;
+  border-bottom: 1px solid var(--border) !important;
+  background: var(--bg-card) !important;
+}
+body.ui-new .chat-panel-title {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: var(--text) !important;
+}
+
+/* Лента сообщений */
+body.ui-new .admin-chat-messages {
+  padding: 12px 14px !important;
+  gap: 8px !important;
+}
+
+/* Композер */
+body.ui-new .admin-chat-input-row {
+  padding: 10px 12px !important;
+  border-top: 1px solid var(--border) !important;
+  gap: 6px !important;
+  background: var(--bg-sidebar) !important;
+}
+body.ui-new .admin-chat-input {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 8px 10px !important;
+  font-size: 13px !important;
+  color: var(--text) !important;
+}
+body.ui-new .admin-chat-input:focus {
+  border-color: var(--accent-border, rgba(99,102,241,0.28)) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px var(--accent-muted) !important;
+}
+body.ui-new .admin-chat-send {
+  border-radius: 8px !important;
+}
+body.ui-new .admin-chat-img-btn {
+  width: 36px; height: 36px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  cursor: pointer;
+}
+
+/* Табы Log/Chat */
+body.ui-new .detail-chat-tabs {
+  display: inline-flex !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  padding: 3px !important;
+  gap: 2px !important;
+}
+body.ui-new .detail-chat-tab {
+  padding: 6px 14px !important;
+  border: 0 !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+  color: var(--text-muted) !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 120ms ease !important;
+  position: relative !important;
+}
+body.ui-new .detail-chat-tab:hover:not(.is-active) { color: var(--text) !important; }
+body.ui-new .detail-chat-tab.is-active {
+  background: var(--bg-card) !important;
+  color: var(--text) !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
+}
+body.ui-new .tab-chat-new-dot {
+  position: absolute !important;
+  top: 4px !important; right: 6px !important;
+  width: 6px !important; height: 6px !important;
+  background: var(--danger) !important;
+  border-radius: 50% !important;
+}
+
 /* Тогглер «Новый дизайн» — маленькая кнопка в углу хедера */
 .ui-new-toggle {
   display: inline-flex; align-items: center; gap: 6px;
