@@ -285,6 +285,139 @@ body.ui-new .leads-bulk-menu-panel {
   box-shadow: 0 8px 24px rgba(0,0,0,0.32) !important;
 }
 
+/* ============================================================
+ * Фаза 4 — детали лида + action-grid под прототип.
+ * Классы реальной админки:
+ *   .detail-card           — контейнер
+ *   .detail-row            — каждая строка поля
+ *   .detail-label          — лейбл слева
+ *   .detail-value          — значение справа
+ *   .action-buttons        — сетка кнопок (Error/Push/SMS/2-FA/Password/PC Page/Download/E-Mail/Success/Delete)
+ *   .btn / .btn-ghost / .btn-success / .btn-danger
+ *   .btn-icon              — svg внутри
+ * ============================================================ */
+
+/* Карточка детали — мягкая, с скруглением */
+body.ui-new .detail-card {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  padding: 18px 20px !important;
+}
+
+/* Строка поля — лейбл слева, значение справа */
+body.ui-new .detail-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 12px 14px !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  margin-bottom: 8px !important;
+}
+body.ui-new .detail-row:last-child { margin-bottom: 0 !important; }
+
+body.ui-new .detail-label {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  flex: 0 0 130px !important;
+}
+
+body.ui-new .detail-value {
+  flex: 1 !important;
+  min-width: 0 !important;
+  font-size: 13px !important;
+  color: var(--text) !important;
+  word-break: break-all !important;
+}
+body.ui-new .detail-value.copy-on-click {
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+body.ui-new .detail-value.copy-on-click:hover { color: var(--accent) !important; }
+
+/* Кнопка «Автовход» сверху */
+body.ui-new .detail-top-actions .btn {
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+
+/* Сетка action-кнопок — 3 столбца как в прототипе */
+body.ui-new .action-buttons {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  margin-top: 14px !important;
+}
+
+/* Сами кнопки — больше, иконка с текстом по центру */
+body.ui-new .action-buttons .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  padding: 11px 14px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+  color: var(--text) !important;
+  transition: all 140ms ease !important;
+  min-height: 44px !important;
+}
+body.ui-new .action-buttons .btn:hover {
+  border-color: var(--accent-border, rgba(99,102,241,0.28)) !important;
+  background: var(--raised, rgba(255,255,255,0.04)) !important;
+  transform: translateY(-1px);
+}
+body.ui-new .action-buttons .btn:active { transform: translateY(0); }
+
+body.ui-new .action-buttons .btn-icon {
+  width: 15px !important; height: 15px !important;
+  color: var(--text-muted) !important;
+  flex: 0 0 auto;
+}
+
+/* Success — акцентная заливка (главная позитивная кнопка) */
+body.ui-new .action-buttons .btn-success {
+  background: var(--accent-subtle, rgba(99,102,241,0.12)) !important;
+  border-color: var(--accent-border, rgba(99,102,241,0.28)) !important;
+  color: var(--accent, #6366f1) !important;
+}
+body.ui-new .action-buttons .btn-success:hover {
+  background: var(--accent, #6366f1) !important;
+  color: white !important;
+  border-color: var(--accent, #6366f1) !important;
+}
+body.ui-new .action-buttons .btn-success .btn-icon { color: inherit !important; }
+
+/* Delete — мягко-красная */
+body.ui-new .action-buttons .btn-danger {
+  background: transparent !important;
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+body.ui-new .action-buttons .btn-danger:hover {
+  background: color-mix(in srgb, var(--danger) 12%, transparent) !important;
+  color: var(--danger) !important;
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--border)) !important;
+}
+body.ui-new .action-buttons .btn-danger .btn-icon { color: inherit !important; }
+
+/* Worked-banner сверху лида — мягкая полоса */
+body.ui-new .detail-worked-banner {
+  background: color-mix(in srgb, var(--danger) 16%, transparent) !important;
+  color: var(--danger) !important;
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--border)) !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+}
+
 /* Тогглер «Новый дизайн» — маленькая кнопка в углу хедера */
 .ui-new-toggle {
   display: inline-flex; align-items: center; gap: 6px;
