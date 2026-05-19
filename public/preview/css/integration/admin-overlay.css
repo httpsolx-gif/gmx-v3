@@ -125,6 +125,158 @@ body.ui-new .btn-primary {
 }
 body.ui-new .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
+/* ============================================================
+ * Фаза 3 — список лидов под палитру и стиль прототипа.
+ * Меняем только CSS, JS-рендер в admin-leads-list.js не трогаем.
+ * Классы:
+ *   .session-item — строка лида
+ *   .session-num  — порядковый номер
+ *   .session-status (.offline/.danger) — статус-точка
+ *   .session-title — email
+ *   .action-badge — статусная плашка (success/warning/info/...)
+ * ============================================================ */
+
+/* Контейнер строки — карточка как в прототипе */
+body.ui-new .session-item {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  border-radius: 10px !important;
+  padding: 9px 10px !important;
+  margin: 2px 8px !important;
+  transition: all 120ms ease !important;
+}
+body.ui-new .session-item:hover {
+  background: var(--raised, #1a1a20) !important;
+}
+body.ui-new .session-item.active {
+  background: var(--accent-subtle, rgba(99,102,241,0.12)) !important;
+  border-color: var(--accent-border, rgba(99,102,241,0.28)) !important;
+  position: relative;
+}
+body.ui-new .session-item.active::before {
+  content: '';
+  position: absolute; left: -1px; top: 8px; bottom: 8px;
+  width: 2px; background: var(--accent, #6366f1);
+  border-radius: 0 2px 2px 0;
+}
+
+/* Порядковый номер слева */
+body.ui-new .session-num {
+  font-size: 11px !important;
+  color: var(--text-3, #5a5e68) !important;
+  font-variant-numeric: tabular-nums !important;
+  width: 18px !important;
+  text-align: right !important;
+  flex-shrink: 0 !important;
+}
+
+/* Статус-точка: только зелёный (online) / красный (offline) */
+body.ui-new .session-status {
+  width: 7px !important; height: 7px !important;
+  border-radius: 50% !important;
+  background: var(--success, #2dba81) !important;
+  box-shadow: 0 0 0 3px var(--success-subtle, rgba(45,186,129,0.12)) !important;
+  flex-shrink: 0 !important;
+}
+body.ui-new .session-status.offline,
+body.ui-new .session-status.danger {
+  background: var(--danger, #e0625e) !important;
+  box-shadow: 0 0 0 3px var(--danger-subtle, rgba(224,98,94,0.12)) !important;
+}
+
+/* Email лида — более заметный */
+body.ui-new .session-title {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--text-1, #ededf0) !important;
+}
+
+/* Статус-бейдж — крупная плашка-пилюля как в прототипе */
+body.ui-new .action-badge {
+  flex: 1 !important;
+  justify-content: center !important;
+  text-align: center !important;
+  padding: 5px 12px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  border-radius: 999px !important;
+  letter-spacing: 0.01em !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+body.ui-new .session-meta-row .action-badge { width: 100%; }
+body.ui-new .action-badge.success {
+  background: color-mix(in srgb, var(--success, #2dba81) 22%, transparent) !important;
+  color: #1f8a5b !important;
+}
+body.ui-new .action-badge.warning {
+  background: color-mix(in srgb, var(--warning, #d4a35a) 28%, transparent) !important;
+  color: #8e6014 !important;
+}
+body.ui-new .action-badge.danger {
+  background: color-mix(in srgb, var(--danger, #e0625e) 22%, transparent) !important;
+  color: #a23a36 !important;
+}
+body.ui-new .action-badge.info,
+body.ui-new .action-badge.brand,
+body.ui-new .action-badge.accent {
+  background: color-mix(in srgb, var(--accent, #6366f1) 22%, transparent) !important;
+  color: #3a3dca !important;
+}
+html[data-theme="dark"] body.ui-new .action-badge.success { color: #6fdcad !important; }
+html[data-theme="dark"] body.ui-new .action-badge.warning { color: #e8c074 !important; }
+html[data-theme="dark"] body.ui-new .action-badge.danger  { color: #ef8480 !important; }
+html[data-theme="dark"] body.ui-new .action-badge.info,
+html[data-theme="dark"] body.ui-new .action-badge.brand,
+html[data-theme="dark"] body.ui-new .action-badge.accent { color: #a5a7f7 !important; }
+
+/* Тулбар сайдбара — отступы и фон */
+body.ui-new .leads-sidebar-toolbar {
+  background: var(--bg-sidebar) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 10px 12px !important;
+}
+
+/* Поиск */
+body.ui-new .leads-toolbar-search .leads-sidebar-search-input {
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  font-size: 13px !important;
+}
+
+/* Пагинация — компактные пилюли */
+body.ui-new .leads-pagination-prev,
+body.ui-new .leads-pagination-next {
+  border-radius: 8px !important;
+  background: var(--bg) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Кнопка «Все» / «Скрытые» — пилюли как chip-tab */
+body.ui-new .leads-toolbar-select-all,
+body.ui-new .leads-toggle-archived {
+  border-radius: 6px !important;
+  font-size: 12.5px !important;
+  font-weight: 500 !important;
+}
+body.ui-new .leads-toggle-archived.is-active {
+  background: var(--accent-subtle, rgba(99,102,241,0.12)) !important;
+  color: var(--accent, #6366f1) !important;
+  border-color: var(--accent-border, rgba(99,102,241,0.28)) !important;
+}
+
+/* Bulk-menu — 3-точки иконка */
+body.ui-new .leads-bulk-menu-trigger {
+  border-radius: 8px !important;
+}
+body.ui-new .leads-bulk-menu-panel {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-strong, #26262c) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.32) !important;
+}
+
 /* Тогглер «Новый дизайн» — маленькая кнопка в углу хедера */
 .ui-new-toggle {
   display: inline-flex; align-items: center; gap: 6px;
